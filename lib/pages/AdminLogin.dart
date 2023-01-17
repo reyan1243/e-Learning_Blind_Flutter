@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import "AdminMenu.dart";
-import 'package:elearningblind/services/firebase.dart';
 // ignore: import_of_legacy_library_into_null_safe
-import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
+import 'package:elearningblind/services/login_service.dart';
 
 class AdminLogin extends StatefulWidget {
   const AdminLogin({Key? key}) : super(key: key);
@@ -12,18 +11,14 @@ class AdminLogin extends StatefulWidget {
 }
 
 class _AdminLoginState extends State<AdminLogin> {
-  AuthClass authClass = AuthClass();
-
-  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _idController = TextEditingController();
 
   final TextEditingController _passwordController = TextEditingController();
-
-  firebase_auth.FirebaseAuth firebaseAuth = firebase_auth.FirebaseAuth.instance;
 
   // prevent memory leaks
   @override
   void dispose() {
-    _emailController.dispose();
+    _idController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -63,9 +58,9 @@ class _AdminLoginState extends State<AdminLogin> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
                             TextField(
-                              controller: _emailController,
+                              controller: _idController,
                               decoration: const InputDecoration(
-                                labelText: 'Email',
+                                labelText: 'Id',
                               ),
                             ),
                             const SizedBox(height: 16.0),
@@ -81,9 +76,11 @@ class _AdminLoginState extends State<AdminLogin> {
                               child: const Text('Log In'),
                               onPressed: () async {
                                 try {
-                                  await firebaseAuth.signInWithEmailAndPassword(
-                                      email: _emailController.text,
-                                      password: _passwordController.text);
+                                  var response = await LoginService.adminLogIn(
+                                      _idController.text,
+                                      _passwordController.text);
+                                  // print what we get
+                                  debugPrint(response.toString());
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(

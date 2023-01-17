@@ -8,7 +8,6 @@ import 'pages/StudentSignup.dart';
 
 // firebase
 import 'package:firebase_core/firebase_core.dart';
-import '/services/firebase.dart';
 
 void main() async {
   // * make sure all widgets are bound
@@ -26,8 +25,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  AuthClass authClass = AuthClass();
-
   @override
   void initState() {
     super.initState();
