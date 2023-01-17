@@ -20,6 +20,9 @@ dependencies:
   flutter:
     sdk: flutter
   speech_recognition: ^0.3.0+1 
+  firebase_core: 
+  firebase_auth: 
+  cloud_firestore: 
 
 dev_dependencies:
   flutter_test:
