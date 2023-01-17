@@ -1,0 +1,4 @@
+bz/rxla/flutter/speechrecognition/BuildConfig.java
+ bz.rxla.flutter.speechrecognition.BuildConfig
+bz/rxla/flutter/speechrecognition/SpeechRecognitionPlugin.java
+ bz.rxla.flutter.speechrecognition.SpeechRecognitionPlugin
