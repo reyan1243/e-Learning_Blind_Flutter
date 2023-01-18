@@ -1,2 +1,6 @@
 # This is a generated file; do not edit or check into version control.
-speech_recognition=/home/oma/.pub-cache/hosted/pub.dartlang.org/speech_recognition-0.3.0+1/
+speech_to_text=C:\\src\\flutter_master\\.pub-cache\\hosted\\pub.dartlang.org\\speech_to_text-6.1.1\\
+speech_to_text_macos=C:\\src\\flutter_master\\.pub-cache\\hosted\\pub.dartlang.org\\speech_to_text_macos-1.0.2\\
+text_to_speech=C:\\src\\flutter_master\\.pub-cache\\hosted\\pub.dartlang.org\\text_to_speech-0.2.3\\
+text_to_speech_macos=C:\\src\\flutter_master\\.pub-cache\\hosted\\pub.dartlang.org\\text_to_speech_macos-0.1.1\\
+text_to_speech_web=C:\\src\\flutter_master\\.pub-cache\\hosted\\pub.dartlang.org\\text_to_speech_web-0.1.2\\

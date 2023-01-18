@@ -5,7 +5,7 @@
     android:versionName="1.0.0" >
 
     <uses-sdk
-        android:minSdkVersion="16"
+        android:minSdkVersion="21"
         android:targetSdkVersion="31" />
     <!--
          Flutter needs it to communicate with the running application
@@ -15,8 +15,12 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <queries>
-        <package android:name="com.google.android.googlequicksearchbox" />
+        <intent>
+            <action android:name="android.speech.RecognitionService" />
+        </intent>
     </queries>
+
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
 
     <application
         android:name="android.app.Application"

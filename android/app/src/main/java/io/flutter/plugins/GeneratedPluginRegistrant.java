@@ -5,7 +5,6 @@ import androidx.annotation.NonNull;
 import io.flutter.Log;
 
 import io.flutter.embedding.engine.FlutterEngine;
-import io.flutter.embedding.engine.plugins.shim.ShimPluginRegistry;
 
 /**
  * Generated file. Do not edit.
@@ -16,11 +15,15 @@ import io.flutter.embedding.engine.plugins.shim.ShimPluginRegistry;
 public final class GeneratedPluginRegistrant {
   private static final String TAG = "GeneratedPluginRegistrant";
   public static void registerWith(@NonNull FlutterEngine flutterEngine) {
-    ShimPluginRegistry shimPluginRegistry = new ShimPluginRegistry(flutterEngine);
     try {
-      bz.rxla.flutter.speechrecognition.SpeechRecognitionPlugin.registerWith(shimPluginRegistry.registrarFor("bz.rxla.flutter.speechrecognition.SpeechRecognitionPlugin"));
+      flutterEngine.getPlugins().add(new com.csdcorp.speech_to_text.SpeechToTextPlugin());
     } catch(Exception e) {
-      Log.e(TAG, "Error registering plugin speech_recognition, bz.rxla.flutter.speechrecognition.SpeechRecognitionPlugin", e);
+      Log.e(TAG, "Error registering plugin speech_to_text, com.csdcorp.speech_to_text.SpeechToTextPlugin", e);
+    }
+    try {
+      flutterEngine.getPlugins().add(new com.ixsans.text_to_speech.TextToSpeechPlugin());
+    } catch(Exception e) {
+      Log.e(TAG, "Error registering plugin text_to_speech, com.ixsans.text_to_speech.TextToSpeechPlugin", e);
     }
   }
 }

@@ -1,1 +1,0 @@
-/home/oma/Desktop/frameworks/Flutter/elearning_modules/elearning_blind (1)/android/app/src/main/kotlin/com/example/elearningblind/MainActivity.kt
