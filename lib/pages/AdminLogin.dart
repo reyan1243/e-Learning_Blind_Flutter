@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import "AdminMenu.dart";
+import 'package:elearningblind/services/login_service.dart';
 
 class AdminLogin extends StatelessWidget {
   const AdminLogin({Key? key}) : super(key: key);
@@ -29,7 +30,6 @@ class AdminLogin extends StatelessWidget {
             child: Column(
               mainAxisAlignment:
                   MainAxisAlignment.center, // this line centers the title
-
               children: [
                 Center(
                   child: Column(
@@ -55,9 +55,12 @@ class AdminLogin extends StatelessWidget {
                             const SizedBox(height: 16.0),
                             ElevatedButton(
                               child: const Text('Log In'),
-                              onPressed: () {
+                              onPressed: () async {
                                 // code for log in action
-                                Navigator.push(
+                                var response = await LoginService.adminLogIn("admin1", "password1");
+                                print("debug print statement");
+                                print(response);
+                                Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => AdminMenu(),

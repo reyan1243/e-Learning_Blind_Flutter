@@ -1,0 +1,2 @@
+com/ixsans/text_to_speech/BuildConfig.java
+ com.ixsans.text_to_speech.BuildConfig

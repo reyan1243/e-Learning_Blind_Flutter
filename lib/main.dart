@@ -5,11 +5,18 @@ import 'pages/AdminLogin.dart';
 import 'pages/StudentSignup.dart';
 import 'package:text_to_speech/text_to_speech.dart' as tts;
 import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:firebase_core/firebase_core.dart';
 
 
-void main() => runApp(MyApp());
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(const MyApp());
+}
 
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -22,7 +29,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       // A widget which will be started on application startup
-      home:  MyHomePage(),
+      home: MyHomePage(),
     );
   }
 }
@@ -33,8 +40,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  // const MyHomePage({Key? key}) : super(key: key);
-  //
 
   late stt.SpeechToText _speech;
   bool _isListening = false;
@@ -42,15 +47,19 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // double _confidence = 1.0;
 
+  late tts.TextToSpeech tt_speech;
+  double rate = 0.5;
+  List<String> _ttsMessages =[
+    'Welcome to E-Learning Blind App',
+    "Student Log In",
+    "Student Signup",
+    "Select Your Choice"
+  ];
 
-late tts.TextToSpeech tt_speech;
-double rate = 0.5;
-List<String> _ttsMessages = ['Welcome to E-Learning Blind App', "Student Log In", "Student Signup", "Select Your Choice"];
-
-_tts(String message) {
-  tt_speech.setRate(rate);
-  tt_speech.speak(message);
-}
+  _tts(String message) {
+    tt_speech.setRate(rate);
+    tt_speech.speak(message);
+  }
 
   void _listen() async {
     if (!_isListening) {
@@ -63,9 +72,6 @@ _tts(String message) {
         _speech.listen(
           onResult: (val) => setState(() {
             _text = val.recognizedWords;
-            // if (val.hasConfidenceRating && val.confidence > 0) {
-            //   _confidence = val.confidence;
-            // }
           }),
         );
       }
@@ -75,41 +81,32 @@ _tts(String message) {
     }
   }
 
-@override
+  @override
   void initState() {
-  _speech = stt.SpeechToText();
-  tt_speech = tts.TextToSpeech();
+    _speech = stt.SpeechToText();
+    tt_speech = tts.TextToSpeech();
 
-  void speak_messages () async{
-    for(int i = 0; i <= 1; i++){
-      await Future.delayed(const Duration(milliseconds: 3000), () {
-        _tts(_ttsMessages[i]);
+    void speak_messages() async {
+      for (int i = 0; i <= 1; i++) {
+        await Future.delayed(const Duration(milliseconds: 3000), () {
+          _tts(_ttsMessages[i]);
+        });
+      }
+      await Future.delayed(const Duration(milliseconds: 2000), () {
+        _listen();
+      });
+      await Future.delayed(const Duration(milliseconds: 2000), () {
+        _speech.stop();
       });
     }
-    await Future.delayed(const Duration(milliseconds: 2000), () {
-      _listen();
 
-    });
-    await Future.delayed(const Duration(milliseconds: 2000), () {
-      _speech.stop();
-
-    });
-
-
+    speak_messages();
+    super.initState();
   }
-
-  speak_messages();
-  // _isListening = true;
-  // _listen();
-  super.initState();
-  }
-
 
   @override
   Widget build(BuildContext context) {
-
-
-    if(_text == "student login"){
+    if (_text == "student login") {
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -119,376 +116,195 @@ _tts(String message) {
     }
 
     return Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          title: const Text('eLearning for blind'),
-        ),
-        body: SingleChildScrollView(
-          child:  Column(
-            children: <Widget>[
-               Container(
-                height: 200,
-                width: MediaQuery.of(context).size.width,
-                decoration:  const BoxDecoration(
-                  image: DecorationImage(
-                    image:   AssetImage("assets/images/background_top.png"),
-                    fit: BoxFit.fill,
-                    alignment: Alignment.topLeft,
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: const Text('eLearning for blind'),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            Container(
+              height: 200,
+              width: MediaQuery.of(context).size.width,
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage("assets/images/background_top.png"),
+                  fit: BoxFit.fill,
+                  alignment: Alignment.topLeft,
+                ),
+              ),
+            ),
+            Center(
+              child: Column(
+                mainAxisAlignment:
+                    MainAxisAlignment.center, // this line centers the title
+
+                children: [
+
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(40.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Column(
+                            children: [
+                              Container(
+                                width: 300,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: ElevatedButton(
+                                    child: const Padding(
+                                      padding: EdgeInsets.all(13.0),
+                                      child: FittedBox(
+                                        child: Text(
+                                          'Student Log In',
+                                          style: TextStyle(
+                                            fontSize: 18.0,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => StudentLogin(),
+                                        ),
+                                      );
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      foregroundColor: Colors.blue,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(18.0),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                width: 300,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: ElevatedButton(
+                                    child: const Padding(
+                                      padding: const EdgeInsets.all(13.0),
+                                      child: FittedBox(
+                                          child: Text('Admin Log In',
+                                              style: TextStyle(
+                                                  fontSize: 18.0,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white))),
+                                    ),
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const AdminLogin(),
+                                        ),
+                                      );
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      foregroundColor: Colors.blue,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(18.0),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                width: 300,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: ElevatedButton(
+                                    child: const Padding(
+                                      padding: EdgeInsets.all(13.0),
+                                      child: FittedBox(
+                                          child: Text('Student Sign Up',
+                                              style: TextStyle(
+                                                  fontSize: 18.0,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white))),
+                                    ),
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const StudentSignup(),
+                                        ),
+                                      );
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      foregroundColor: Colors.blue,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(18.0),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                ) ,
-                ),
-
-               Center(
-                child: Column(
-                  mainAxisAlignment:
-                      MainAxisAlignment.center, // this line centers the title
-
-                  children: [
-                    // Container(
-                    //   padding: const EdgeInsets.all(16.0),
-                    //   child: Text(
-                    //     'eLearning for blind',
-                    //     style: TextStyle(
-                    //       fontSize: 32.0,
-                    //       fontWeight: FontWeight.bold,
-                    //     ),
-                    //   ),
-                    // ),
-                    Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(40.0),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            // const ListTile(
-                            //   title: Text('Select Option'),
-                            // ),
-                            Column(
-                              children: [
-                                Container(
-                                  width: 300,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: ElevatedButton(
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(13.0),
-                                        child: FittedBox(
-                                          child: Text(
-                                            'Student Log In',
-                                            style: TextStyle(
-                                              fontSize: 18.0,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => StudentLogin(),
-                                          ),
-                                        );
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        foregroundColor: Colors.blue,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(18.0),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  width: 300,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: ElevatedButton(
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(13.0),
-                                        child: FittedBox(
-                                            child: Text('Admin Log In',
-                                                style: TextStyle(
-                                                    fontSize: 18.0,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.white))),
-                                      ),
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                const AdminLogin(),
-                                          ),
-                                        );
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        foregroundColor: Colors.blue,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(18.0),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  width: 300,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: ElevatedButton(
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(13.0),
-                                        child: FittedBox(
-                                            child: Text('Student Sign Up',
-                                                style: TextStyle(
-                                                    fontSize: 18.0,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.white))),
-                                      ),
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                const StudentSignup(),
-                                          ),
-                                        );
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        foregroundColor: Colors.blue,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(18.0),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        children: <Widget>[
-                          Text(
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Container(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: <Widget>[
+                        Text(
                           _text,
-                            style: TextStyle(
-                              fontSize: 24.0,
-                              fontWeight: FontWeight.w700,
-                            ),
+                          style: const TextStyle(
+                            fontSize: 24.0,
+                            fontWeight: FontWeight.w700,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
+                  ),
 
-                    Container(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        children: <Widget>[
-                          Text(
-                            'Please enter your choice',
-                            style: TextStyle(
-                              fontSize: 24.0,
-                              fontWeight: FontWeight.w700,
-                            ),
+                  Container(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: <Widget>[
+                        const Text(
+                          'Please enter your choice',
+                          style: TextStyle(
+                            fontSize: 24.0,
+                            fontWeight: FontWeight.w700,
                           ),
-                          SizedBox(height: 16.0),
-                          InkWell(
-                            child: _isListening ?  Icon(Icons.mic) : Icon(Icons.mic_off_outlined),
-                            onTap: () {
-                              _listen();
-                              // code for mic icon press action
-                            },
-                          ),
-                        ],
-                      ),
+                        ),
+                        const SizedBox(height: 16.0),
+                        InkWell(
+                          child: _isListening
+                              ? const Icon(Icons.mic)
+                              : const Icon(Icons.mic_off_outlined),
+                          onTap: () {
+                            _listen();
+                            // code for mic icon press action
+                          },
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              )
-            ],
-          ),
-        ));
-
-//     return Scaffold(
-//         backgroundColor: Image.asset('images/background_top.png').color,
-//         // body: Container(
-//         //   decoration: defaultAppBoxDecoration(),
-//         // ),
-
-//         appBar: AppBar(
-//           title: const Text('eLearning for blind'),
-//         ),
-//         body: Column(
-//           mainAxisAlignment:
-//               MainAxisAlignment.center, // this line centers the title
-
-//           children: [
-//             Container(
-//               padding: const EdgeInsets.all(16.0),
-//               child: Text(
-//                 'eLearning for blind',
-//                 style: TextStyle(
-//                   fontSize: 32.0,
-//                   fontWeight: FontWeight.bold,
-//                 ),
-//               ),
-//             ),
-//             Center(
-//               child: Card(
-//                 shape: RoundedRectangleBorder(
-//                   borderRadius: BorderRadius.circular(16.0),
-//                 ),
-//                 child: Padding(
-//                   padding: const EdgeInsets.all(40.0),
-//                   child: Column(
-//                     mainAxisSize: MainAxisSize.min,
-//                     children: <Widget>[
-//                       // const ListTile(
-//                       //   title: Text('Select Option'),
-//                       // ),
-//                       Column(
-//                         children: [
-//                           Container(
-//                             width: 200,
-//                             child: Padding(
-//                               padding: const EdgeInsets.all(8.0),
-//                               child: ElevatedButton(
-//                                 child: Padding(
-//                                   padding: const EdgeInsets.all(13.0),
-//                                   child: FittedBox(
-//                                     child: Text(
-//                                       'Student Log In',
-//                                       style: TextStyle(
-//                                         fontSize: 18.0,
-//                                         fontWeight: FontWeight.bold,
-//                                         color: Colors.white,
-//                                       ),
-//                                     ),
-//                                   ),
-//                                 ),
-//                                 onPressed: () {
-//                                   Navigator.push(
-//                                     context,
-//                                     MaterialPageRoute(
-//                                       builder: (context) => StudentLogin(),
-//                                     ),
-//                                   );
-//                                 },
-//                                 style: ElevatedButton.styleFrom(
-//                                   foregroundColor: Colors.blue,
-//                                   shape: RoundedRectangleBorder(
-//                                     borderRadius: BorderRadius.circular(18.0),
-//                                   ),
-//                                 ),
-//                               ),
-//                             ),
-//                           ),
-//                           Container(
-//                             width: 200,
-//                             child: Padding(
-//                               padding: const EdgeInsets.all(8.0),
-//                               child: ElevatedButton(
-//                                 child: Padding(
-//                                   padding: const EdgeInsets.all(13.0),
-//                                   child: FittedBox(
-//                                       child: Text('Student Sign Up',
-//                                           style: TextStyle(
-//                                               fontSize: 18.0,
-//                                               fontWeight: FontWeight.bold,
-//                                               color: Colors.white))),
-//                                 ),
-//                                 onPressed: () {
-//                                   Navigator.push(
-//                                     context,
-//                                     MaterialPageRoute(
-//                                       builder: (context) =>
-//                                           const StudentSignup(),
-//                                     ),
-//                                   );
-//                                 },
-//                                 style: ElevatedButton.styleFrom(
-//                                   foregroundColor: Colors.blue,
-//                                   shape: RoundedRectangleBorder(
-//                                     borderRadius: BorderRadius.circular(18.0),
-//                                   ),
-//                                 ),
-//                               ),
-//                             ),
-//                           ),
-//                           Container(
-//                             width: 200,
-//                             child: Padding(
-//                               padding: const EdgeInsets.all(8.0),
-//                               child: ElevatedButton(
-//                                 child: Padding(
-//                                   padding: const EdgeInsets.all(13.0),
-//                                   child: FittedBox(
-//                                       child: Text('Admin Log In',
-//                                           style: TextStyle(
-//                                               fontSize: 18.0,
-//                                               fontWeight: FontWeight.bold,
-//                                               color: Colors.white))),
-//                                 ),
-//                                 onPressed: () {
-//                                   Navigator.push(
-//                                     context,
-//                                     MaterialPageRoute(
-//                                       builder: (context) => const AdminLogin(),
-//                                     ),
-//                                   );
-//                                 },
-//                                 style: ElevatedButton.styleFrom(
-//                                   foregroundColor: Colors.blue,
-//                                   shape: RoundedRectangleBorder(
-//                                     borderRadius: BorderRadius.circular(18.0),
-//                                   ),
-//                                 ),
-//                               ),
-//                             ),
-//                           ),
-//                         ],
-//                       ),
-//                     ],
-//                   ),
-//                 ),
-//               ),
-//             ),
-//             SizedBox(
-//               height: 80,
-//             ),
-//             Container(
-//               padding: const EdgeInsets.all(16.0),
-//               child: Column(
-//                 children: <Widget>[
-//                   Text(
-//                     'Please enter your choice',
-//                     style: TextStyle(
-//                       fontSize: 24.0,
-//                       fontWeight: FontWeight.w500,
-//                     ),
-//                   ),
-//                   SizedBox(height: 16.0),
-//                   InkWell(
-//                     child: Icon(Icons.mic),
-//                     onTap: () {
-//                       // code for mic icon press action
-//                     },
-//                   ),
-//                 ],
-//               ),
-//             ),
-//           ],
-//         ));
+                  ),
+                ],
+              ),
+            )
+          ],
+        ),
+      ),
+    );
   }
 }
