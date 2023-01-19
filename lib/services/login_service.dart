@@ -1,15 +1,29 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class LoginService{
-  static Future<QuerySnapshot<Map<String, dynamic>>> adminLogIn(String adminId, String password) async {
-    return await FirebaseFirestore.instance
+class LoginService {
+  static Future<QuerySnapshot<Map<String, dynamic>>> adminLogIn(
+      String adminId, String password) async {
+    final querySnapshot = await FirebaseFirestore.instance
         .collection('admins')
         .where('admin_id', isEqualTo: adminId)
         .where('password', isEqualTo: password)
         .get();
+
+    // note
+    // in case of a successful login, auth:true is stored in local storage
+    // when the app is started, if a key named auth having value true
+    // is found then user should stay logged in
+    if (querySnapshot.docs.isNotEmpty) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('auth', true);
+    }
+
+    return querySnapshot;
   }
 
-  static Future<QuerySnapshot<Map<String, dynamic>>> studentLogIn(String email, String password) async {
+  static Future<QuerySnapshot<Map<String, dynamic>>> studentLogIn(
+      String email, String password) async {
     // note
     /*
     * we will take email from student as just his username (everything before @)
@@ -27,10 +41,21 @@ class LoginService{
     * */
     var studentEmail = email + "@college.eu";
 
-    return await FirebaseFirestore.instance
+    final querySnapshot = await FirebaseFirestore.instance
         .collection('user')
         .where('studentEmail', isEqualTo: studentEmail)
         .where('studentPassword', isEqualTo: password)
         .get();
+
+    // note
+    // in case of a successful login, auth:true is stored in local storage
+    // when the app is started, if a key named auth having value true
+    // is found then user should stay logged in
+    if (querySnapshot.docs.isNotEmpty) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('auth', true);
+    }
+
+    return querySnapshot;
   }
 }
