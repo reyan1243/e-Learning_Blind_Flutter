@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
 class StudentSignup extends StatelessWidget {
+  static const routeName = 'StudentSignup';
+
   const StudentSignup({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.white10,
+        backgroundColor: Colors.white,
         appBar: AppBar(
           title: Text('Student Sign Up'),
         ),

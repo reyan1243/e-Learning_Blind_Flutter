@@ -1,15 +1,122 @@
+import 'package:elearningblind/pages/HomePage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import "StudentMenu.dart";
+import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:text_to_speech/text_to_speech.dart' as tts;
 
-class StudentLogin extends StatelessWidget {
-  const StudentLogin({Key? key}) : super(key: key);
+
+
+class StudentLogin extends StatefulWidget {
+  static const routeName = 'StudentLogin';
+
+  @override
+  State<StudentLogin> createState() => _StudentLoginState();
+}
+
+class _StudentLoginState extends State<StudentLogin> {
+
+  late stt.SpeechToText _speech;
+  bool _isListening = false;
+
+  late tts.TextToSpeech tt_speech;
+  double rate = 0.5;
+  List<String> _ttsMessages = [
+    'Login Page',
+    "Select Your Choice"
+  ];
+
+  _tts(String message) {
+    tt_speech.setRate(rate);
+    tt_speech.speak(message);
+  }
+
+  void _listen() async {
+    if (!_isListening) {
+      bool available = await _speech.initialize(
+        onStatus: (val) => print('onStatus: $val'),
+        onError: (val) => {print('onError: $val')},
+      );
+      if (available) {
+        setState(() => _isListening = true);
+        _speech.listen(
+          onResult: (val) => setState(() {
+            _text = val.recognizedWords;
+            // if (val.hasConfidenceRating && val.confidence > 0) {
+            //   _confidence = val.confidence;
+            // }
+          }),
+        );
+      }
+    } else {
+      setState(() => _isListening = false);
+      _speech.stop();
+    }
+  }
+
+  @override
+  void initState() {
+    _speech = stt.SpeechToText();
+    tt_speech = tts.TextToSpeech();
+
+    void speak_messages() async {
+      for (int i = 0; i <= 1; i++) {
+        await Future.delayed(const Duration(milliseconds: 3000), () {
+          _tts(_ttsMessages[i]);
+        });
+      }
+      //
+      // await Future.delayed(const Duration(milliseconds: 2000), () {
+      //   _listen();
+      // });
+
+      // await Future.delayed(const Duration(milliseconds: 6000), () {
+      //   _isListening = false;
+      // });
+    }
+
+    speak_messages();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    tt_speech.stop();
+    _text = "";
+    _isListening = false;
+    super.dispose();
+  }
+
+  String _text = 'Speech Text';
 
   @override
   Widget build(BuildContext context) {
+
+    if (_text == "back") {
+      setState(() {
+        _isListening = false;
+      });
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        Navigator.pop(context);
+      });
+    }
+    else if(_text == 'login'){
+      setState(() {
+        _isListening = false;
+      });
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        Navigator.pushReplacementNamed(context, StudentMenu.routeName);
+      });
+    }
+
     return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
           title: Text('Student Log In'),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () => Navigator.of(context).pushReplacementNamed(MyHomePage.routeName),
+          ),
         ),
         body: SingleChildScrollView(
           child: Column(
@@ -17,9 +124,9 @@ class StudentLogin extends StatelessWidget {
               Container(
                 height: 200,
                 width: MediaQuery.of(context).size.width,
-                decoration: new BoxDecoration(
-                  image: new DecorationImage(
-                    image: new AssetImage("assets/images/background_top.png"),
+                decoration: const BoxDecoration(
+                  image:  DecorationImage(
+                    image:  AssetImage("assets/images/background_top.png"),
                     fit: BoxFit.fill,
                     alignment: Alignment.topRight,
                   ),
@@ -109,20 +216,23 @@ class StudentLogin extends StatelessWidget {
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
                         children: <Widget>[
-                          Text(
+                          const Text(
                             'Please enter your choice',
                             style: TextStyle(
                               fontSize: 24.0,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
-                          SizedBox(
-                            height: 16.0,
-                          ),
+                          SizedBox(height: 16.0),
                           InkWell(
-                            child: Icon(Icons.mic),
+                            child: _isListening == true
+                                ? Icon(Icons.mic, size: MediaQuery.of(context).size.height * 0.3,)
+                                : Icon(Icons.mic_off, size: MediaQuery.of(context).size.height * 0.3),
+
                             onTap: () {
-                              // code for mic icon press action
+                              tt_speech.stop();
+                              _text = "";
+                              _listen();
                             },
                           ),
                         ],

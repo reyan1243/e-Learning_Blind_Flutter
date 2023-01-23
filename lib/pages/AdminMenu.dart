@@ -6,6 +6,7 @@ import 'StudentChat.dart';
 import 'LecturesMenu.dart';
 
 class AdminMenu extends StatelessWidget {
+  static const routeName = 'AdminMenu';
   var items = [
     {0: "Announcements", 1: AnnouncementsMenu()},
     {0: "Test & Assignments", 1: TestsMenu()},

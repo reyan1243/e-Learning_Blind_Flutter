@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import "AdminMenu.dart";
 
 class AdminLogin extends StatelessWidget {
+  static const routeName = 'AdminLogin';
+
   const AdminLogin({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.white10,
+        backgroundColor: Colors.white,
         appBar: AppBar(
           title: Text('Admin Log In'),
         ),
