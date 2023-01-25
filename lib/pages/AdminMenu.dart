@@ -3,7 +3,8 @@ import 'AnnouncementsMenu.dart';
 import 'TestsMenu.dart';
 import 'ResultMenu.dart';
 import 'StudentChat.dart';
-import 'LecturesMenu.dart';
+// import 'LecturesMenu.dart';
+import 'AdminLectures.dart';
 
 class AdminMenu extends StatelessWidget {
   static const routeName = 'AdminMenu';
@@ -13,7 +14,7 @@ class AdminMenu extends StatelessWidget {
     {0: "Grades", 1: ResultMenu()},
     {0: "Messages", 1: StudentChat()},
     {0: "Meeting", 1: StudentChat()},
-    {0: "Lectures", 1: LecturesMenu()},
+    {0: "Lectures", 1: AdminLectures()},
   ];
 
   @override
