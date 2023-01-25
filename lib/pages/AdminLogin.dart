@@ -18,13 +18,13 @@ class AdminLogin extends StatelessWidget {
             Container(
               height: 150,
               width: 600,
-              decoration: new BoxDecoration(
-                image: new DecorationImage(
-                  image: new AssetImage("images/background_top.png"),
-                  fit: BoxFit.fill,
-                  alignment: Alignment.topRight,
-                ),
-              ),
+              // decoration: new BoxDecoration(
+              //   image: new DecorationImage(
+              //     image: new AssetImage("images/background_top.png"),
+              //     fit: BoxFit.fill,
+              //     alignment: Alignment.topRight,
+              //   ),
+              // ),
             ),
             Container(),
             Center(
@@ -83,32 +83,32 @@ class AdminLogin extends StatelessWidget {
                       ],
                     ),
                   ),
-                  SizedBox(
-                    height: 80,
-                  ),
-                  Container(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      children: <Widget>[
-                        Text(
-                          'Please enter your choice',
-                          style: TextStyle(
-                            fontSize: 24.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(
-                          height: 16.0,
-                        ),
-                        InkWell(
-                          child: Icon(Icons.mic),
-                          onTap: () {
-                            // code for mic icon press action
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
+                  // SizedBox(
+                  //   height: 80,
+                  // ),
+                  // Container(
+                  //   padding: const EdgeInsets.all(16.0),
+                  //   child: Column(
+                  //     children: <Widget>[
+                  //       Text(
+                  //         'Please enter your choice',
+                  //         style: TextStyle(
+                  //           fontSize: 24.0,
+                  //           fontWeight: FontWeight.bold,
+                  //         ),
+                  //       ),
+                  //       SizedBox(
+                  //         height: 16.0,
+                  //       ),
+                  //       InkWell(
+                  //         child: Icon(Icons.mic),
+                  //         onTap: () {
+                  //           // code for mic icon press action
+                  //         },
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
                 ],
               ),
             ),

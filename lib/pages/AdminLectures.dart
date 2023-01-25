@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import "UploadPdf.dart";
 
 class AdminLectures extends StatelessWidget {
+  static const routeName = 'AdminLectures';
+
   var items = [
     "Lectutres 1",
     "Lectutres 2",
@@ -47,35 +49,33 @@ class AdminLectures extends StatelessWidget {
                 width: 300,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton(
-                    child: Padding(
-                      padding: const EdgeInsets.all(13.0),
-                      child: FittedBox(
-                          child: Text('Upload Pdf',
-                              style: TextStyle(
-                                  fontSize: 18.0,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white))),
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => UploadPdf(),
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.blue,
-                      shape: RoundedRectangleBorder(
-                        borderRadius:
-                        BorderRadius.circular(18.0),
-                      ),
-                    ),
-                  ),
+                  // child: ElevatedButton(
+                  //   child: Padding(
+                  //     padding: const EdgeInsets.all(13.0),
+                  //     child: FittedBox(
+                  //         child: Text('Upload Pdf',
+                  //             style: TextStyle(
+                  //                 fontSize: 18.0,
+                  //                 fontWeight: FontWeight.bold,
+                  //                 color: Colors.white))),
+                  //   ),
+                  //   // onPressed: () {
+                  //   //   Navigator.push(
+                  //   //     context,
+                  //   //     MaterialPageRoute(
+                  //   //       builder: (context) => UploadPdf(),
+                  //   //     ),
+                  //   //   );
+                  //   // },
+                  //   style: ElevatedButton.styleFrom(
+                  //     foregroundColor: Colors.blue,
+                  //     shape: RoundedRectangleBorder(
+                  //       borderRadius: BorderRadius.circular(18.0),
+                  //     ),
+                  //   ),
+                  // ),
                 ),
               ),
-
             ],
           ),
         ),
