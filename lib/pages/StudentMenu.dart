@@ -1,3 +1,5 @@
+import 'package:elearningblind/pages/CoursesMenu.dart';
+import 'package:elearningblind/pages/GradesMenu.dart';
 import 'package:elearningblind/pages/HomePage.dart';
 import 'package:elearningblind/pages/StudentLogIn.dart';
 import 'package:flutter/material.dart';
@@ -19,12 +21,24 @@ class StudentMenu extends StatefulWidget {
 
 class _StudentMenuState extends State<StudentMenu> {
   var items = [
-    {0: "Announcements", 1: AnnouncementsMenu()},
-    {0: "Test & Assignments", 1: TestsMenu()},
-    {0: "Grades", 1: ResultMenu()},
+    {0: "Announcements", 1: AnnouncementsMenu(false)},
+    {
+      0: "Test & Assignments",
+      1: CoursesMenu(
+        isAdmin: false,
+        isTestMenu: true,
+      )
+    },
+    {0: "Grades", 1: GradesMenu()},
     {0: "Messages", 1: StudentChat()},
     // {0: "Meeting", 1: StudentChat()},
-    {0: "Lectures", 1: LecturesMenu()},
+    {
+      0: "Lectures",
+      1: CoursesMenu(
+        isAdmin: false,
+        isTestMenu: false,
+      )
+    },
   ];
 
   late stt.SpeechToText _speech;
@@ -126,23 +140,21 @@ class _StudentMenuState extends State<StudentMenu> {
       SchedulerBinding.instance.addPostFrameCallback((_) {
         Navigator.pushNamed(context, TestsMenu.routeName);
       });
-    }
-    else if (_text == 'lectures') {
+    } else if (_text == 'lectures') {
       setState(() {
         _isListening = false;
       });
       SchedulerBinding.instance.addPostFrameCallback((_) {
         Navigator.pushNamed(context, LecturesMenu.routeName);
       });
-    } else if (_text == 'test' || _text == 'assignments' ) {
+    } else if (_text == 'test' || _text == 'assignments') {
       setState(() {
         _isListening = false;
       });
       SchedulerBinding.instance.addPostFrameCallback((_) {
         Navigator.pushNamed(context, TestsMenu.routeName);
       });
-    }
-    else if (_text == 'messages') {
+    } else if (_text == 'messages') {
       setState(() {
         _isListening = false;
       });
@@ -190,7 +202,7 @@ class _StudentMenuState extends State<StudentMenu> {
                   width: 20.0,
                 ),
                 Column(
-                  children: [
+                  children: const [
                     Text(
                       "Welcome,",
                       style: TextStyle(fontSize: 20),
