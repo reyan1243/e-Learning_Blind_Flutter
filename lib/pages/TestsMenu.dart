@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:elearningblind/pages/AddAnswer.dart';
 import 'package:elearningblind/pages/AddTestAssignment.dart';
 import 'package:elearningblind/pages/EditTestAssignment.dart';
 import 'package:flutter/material.dart';
@@ -60,6 +61,21 @@ class _TestsMenuState extends State<TestsMenu> {
                                   fontWeight: FontWeight.bold, fontSize: 25),
                             ),
                             GestureDetector(
+                              onTap: (){
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        AddAnswer(
+                                          data: {
+                                            "docID": document.id,
+                                            "studentID": ""//todo: student id,
+                                          },
+                                          courseID: widget.courseId!,
+                                        )
+                                  ),
+                                );
+                              },
                               onLongPress: () {
                                 widget.isAdmin!
                                     ? Navigator.push(

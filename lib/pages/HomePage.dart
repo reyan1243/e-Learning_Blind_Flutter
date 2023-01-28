@@ -61,7 +61,7 @@ class _MyHomePageState extends State<MyHomePage> {
     tt_speech = tts.TextToSpeech();
 
     void speak_messages() async {
-      for (int i = 0; i <= 1; i++) {
+      for (int i = 0; i <= 2; i++) {
         await Future.delayed(const Duration(milliseconds: 3000), () {
           _tts(_ttsMessages[i]);
         });

@@ -48,7 +48,6 @@ class MyApp extends StatelessWidget {
         LecturesMenu.routeName: (ctx) => LecturesMenu(),
         CoursesMenu.routeName: (ctx) => CoursesMenu(
               isAdmin: false,
-              isTestMenu: false,
             ),
         ResultMenu.routeName: (ctx) => ResultMenu(),
         TestsMenu.routeName: (ctx) => TestsMenu(),

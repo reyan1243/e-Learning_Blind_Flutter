@@ -24,22 +24,39 @@ class StudentMenu extends StatefulWidget {
 }
 
 class _StudentMenuState extends State<StudentMenu> {
-  late String? studentID, name, username;
+  var items = [
+    //Announcement,courses(lectures-update-to-courses),Messages
+    {0: "Announcements", 1: AnnouncementsMenu(false)},
+    // {
+    //   0: "Test & Assignments",
+    //   1: CoursesMenu(
+    //     isAdmin: false,
+    //     isTestMenu: true,
+    //   )
+    // },
+    // {0: "Grades", 1: GradesMenu()},
+    {0: "Messages", 1: StudentChat(false, "")},
+    // {0: "Meeting", 1: StudentChat()},
+    {
+      0: "Courses",
+      1: CoursesMenu(
+        isAdmin: false,
+      )
+    },
+  ];
+
   late stt.SpeechToText _speech;
-
   bool _isListening = false;
+
   late tts.TextToSpeech tt_speech;
-
+  late String? studentID, name, username;
   double rate = 0.5;
-
   final List<String> _ttsMessages = [
     'Student Menu',
     "Welcome Student",
     "Announcements",
-    "Tests and Assignments",
-    "Grades",
     "Messages",
-    "Lectures",
+    "Courses",
     "Select Your Choice"
   ];
 
@@ -77,6 +94,7 @@ class _StudentMenuState extends State<StudentMenu> {
   void initState() {
     tt_speech = tts.TextToSpeech();
     _speech = stt.SpeechToText();
+
     studentID = widget.data['studentID'];
     name = widget.data['name'];
     username = widget.data['username'];
@@ -108,32 +126,10 @@ class _StudentMenuState extends State<StudentMenu> {
     super.dispose();
   }
 
-  var items = [
-    {0: "Announcements", 1: AnnouncementsMenu(false)},
-    {
-      0: "Test & Assignments",
-      1: CoursesMenu(
-        isAdmin: false,
-        isTestMenu: true,
-      )
-    },
-    {0: "Grades", 1: GradesMenu("")},
-    {0: "Messages", 1: StudentChat(false, "")},
-    // {0: "Meeting", 1: StudentChat()},
-    {
-      0: "Lectures",
-      1: CoursesMenu(
-        isAdmin: false,
-        isTestMenu: false,
-      )
-    },
-  ];
-
   @override
   Widget build(BuildContext context) {
     if (_text == "logout" || _text == "back") {
       setState(() {
-        tt_speech.stop();
         _isListening = false;
       });
       SchedulerBinding.instance.addPostFrameCallback((_) {
@@ -141,99 +137,57 @@ class _StudentMenuState extends State<StudentMenu> {
       });
     } else if (_text == 'announcements') {
       setState(() {
-        tt_speech.stop();
         _isListening = false;
       });
-
       SchedulerBinding.instance.addPostFrameCallback((_) {
         Navigator.pushNamed(context, AnnouncementsMenu.routeName);
       });
-    } else if (_text == 'tests') {
+    }
+    // else if (_text == 'tests') {
+    //   setState(() {
+    //     _isListening = false;
+    //   });
+    //   SchedulerBinding.instance.addPostFrameCallback((_) {
+    //     Navigator.pushNamed(context, TestsMenu.routeName);
+    //   });
+    // }
+    else if (_text == 'courses') {
       setState(() {
-        tt_speech.stop();
         _isListening = false;
       });
-
       SchedulerBinding.instance.addPostFrameCallback((_) {
-        Navigator.pushNamed(context, TestsMenu.routeName);
+        Navigator.pushNamed(context, CoursesMenu.routeName);
       });
-    } else if (_text == 'lectures') {
+    }
+    //   else if (_text == 'test' || _text == 'assignments') {
+    //   setState(() {
+    //     _isListening = false;
+    //   });
+    //   SchedulerBinding.instance.addPostFrameCallback((_) {
+    //     Navigator.pushNamed(context, TestsMenu.routeName);
+    //   });
+    // }
+    else if (_text == 'messages') {
       setState(() {
-        tt_speech.stop();
         _isListening = false;
       });
-
-      SchedulerBinding.instance.addPostFrameCallback((_) {
-        Navigator.pushNamed(context, LecturesMenu.routeName);
-      });
-    } else if (_text == 'test' || _text == 'assignments') {
-      setState(() {
-        tt_speech.stop();
-        _isListening = false;
-      });
-
-      SchedulerBinding.instance.addPostFrameCallback((_) {
-        Navigator.pushNamed(context, TestsMenu.routeName);
-      });
-    } else if (_text == 'messages') {
-      setState(() {
-        tt_speech.stop();
-        _isListening = false;
-      });
-
       SchedulerBinding.instance.addPostFrameCallback((_) {
         Navigator.pushNamed(context, StudentChat.routeName);
       });
-    } else if (_text == 'grades') {
-      setState(() {
-        tt_speech.stop();
-        _isListening = false;
-      });
-      // SchedulerBinding.instance.addPostFrameCallback((_) {
-      //   Navigator.pushNamed(context, Grad.routeName);
-      // });
     }
+    //   else if (_text == 'grades') {
+    //   setState(() {
+    //     _isListening = false;
+    //   });
+    //   SchedulerBinding.instance.addPostFrameCallback((_) {
+    //     Navigator.pushNamed(context, Grad.routeName);
+    //   });
+    // }
 
-    _tts("Welcome ${name}");
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Student Menu'),
+        title: Text('Student Menu'),
         automaticallyImplyLeading: false,
-        actions: [
-          IconButton(
-              icon: const Icon(Icons.logout, color: Colors.white),
-              onPressed: () => showDialog(
-                  context: context,
-                  builder: (ctx) => AlertDialog(
-                        content: const Text('Do you want to logout?'),
-                        actions: <Widget>[
-                          TextButton(
-                              onPressed: () async {
-                                // final user = await FirebaseAuth
-                                //     .instance
-                                //     .currentUser();
-                                tt_speech.stop();
-                                Navigator.of(context)
-                                    .pushReplacementNamed(MyHomePage.routeName);
-                              },
-                              child: const Text(
-                                'Yes',
-                                style: TextStyle(color: Colors.black),
-                              )),
-                          TextButton(
-                            onPressed: () {
-                              tt_speech.stop();
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text('No',
-                                style: TextStyle(color: Colors.black)),
-                          ),
-                        ],
-                      ))
-
-              // .pushReplacementNamed(MyHomePage.routeName),
-              ),
-        ],
       ),
       body: Container(
         padding: EdgeInsets.only(top: 10),
@@ -241,17 +195,34 @@ class _StudentMenuState extends State<StudentMenu> {
           children: [
             Row(
               children: [
-                SizedBox(
+                // const SizedBox(
+                //   width: 6.0,
+                // ),
+                // Container(
+                //   // padding: EdgeInsets.all(4),
+                //   width: 50,
+                //   height: 50,
+                //   decoration: const BoxDecoration(
+                //     shape: BoxShape.circle,
+                //     image: DecorationImage(
+                //       fit: BoxFit.fill,
+                //       image: NetworkImage(
+                //         'https://media.licdn.com/dms/image/C4D03AQFLPbgktVGZBQ/profile-displayphoto-shrink_800_800/0/1656325697250?e=1678320000&v=beta&t=Cyn-c8j-csmO-Nuc6vhOWX1uoKPRYHv5Qe7GXwLeKXo',
+                //       ),
+                //     ),
+                //   ),
+                // ),
+                const SizedBox(
                   width: 20.0,
                 ),
                 Column(
-                  children: [
+                  children: const [
                     Text(
                       "Welcome,",
                       style: TextStyle(fontSize: 20),
                     ),
                     Text(
-                      name!,
+                      "ABC User",
                       style: TextStyle(fontSize: 20),
                     ),
                   ],
@@ -263,7 +234,7 @@ class _StudentMenuState extends State<StudentMenu> {
             ),
             Expanded(
               child: Container(
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                     color: Colors.grey,
                     borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(60),
@@ -277,14 +248,14 @@ class _StudentMenuState extends State<StudentMenu> {
                       padding: EdgeInsets.all(5),
                       height: 100.0,
                       child: GestureDetector(
-                        onTap: () {
-                          tt_speech.stop();
+                        onTap: () => {
+                          // TODO make this dynamic for each option
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => items[index][1] as Widget,
                             ),
-                          );
+                          )
                         },
                         child: Card(
                           child: Column(
@@ -292,6 +263,12 @@ class _StudentMenuState extends State<StudentMenu> {
                               ListTile(
                                 title: Text(items[index][0].toString()),
                               ),
+                              // InkWell(
+                              //   child: Icon(Icons.mic),
+                              //   onTap: () {
+                              //     // code for mic icon press action
+                              //   },
+                              // ),
                             ],
                           ),
                         ),
@@ -316,15 +293,16 @@ class _StudentMenuState extends State<StudentMenu> {
                   InkWell(
                     child: _isListening == true
                         ? Icon(
-                            Icons.mic,
-                            size: MediaQuery.of(context).size.height * 0.3,
-                          )
+                      Icons.mic,
+                      size: MediaQuery.of(context).size.height * 0.3,
+                    )
                         : Icon(Icons.mic_off,
-                            size: MediaQuery.of(context).size.height * 0.3),
+                        size: MediaQuery.of(context).size.height * 0.3),
                     onTap: () {
                       tt_speech.stop();
                       _text = "";
                       _listen();
+                      print(_text);
                     },
                   ),
                 ],
@@ -336,3 +314,5 @@ class _StudentMenuState extends State<StudentMenu> {
     );
   }
 }
+
+

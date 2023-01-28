@@ -18,7 +18,6 @@ class AdminMenu extends StatelessWidget {
       0: "Test & Assignments",
       1: CoursesMenu(
         isAdmin: true,
-        isTestMenu: true,
       )
     },
     {0: "Grades", 1: AdminGradesMenu()},
@@ -28,7 +27,6 @@ class AdminMenu extends StatelessWidget {
       0: "Lectures",
       1: CoursesMenu(
         isAdmin: true,
-        isTestMenu: false,
       )
     },
   ];
