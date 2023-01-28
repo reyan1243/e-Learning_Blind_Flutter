@@ -153,6 +153,7 @@ class _AddTestAssignmentState extends State<AddTestAssignment> {
                         ),
                       ),
                     ),
+                    //todo: checkbox for type of data
                   ],
                 ),
               ),

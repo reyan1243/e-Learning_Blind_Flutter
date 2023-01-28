@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:elearningblind/pages/EditLectureScreen.dart';
 import 'package:elearningblind/pages/UploadPdf.dart';
+import 'package:text_to_speech/text_to_speech.dart' as tts;
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:flutter/material.dart';
 
-class LecturesMenu extends StatelessWidget {
+class LecturesMenu extends StatefulWidget {
   LecturesMenu({this.isAdmin, this.courseId});
 
   static const routeName = 'LecturesMenu';
@@ -11,15 +13,67 @@ class LecturesMenu extends StatelessWidget {
   bool? isAdmin;
   String? courseId;
 
-  var items = [
-    "Lectutres 1",
-    "Lectutres 2",
-    "Lectutres 3",
-    "Lectutres 4",
-    "Lectutres 5",
-    "Lectutres 6",
-  ];
+  @override
+  State<LecturesMenu> createState() => _LecturesMenuState();
+}
 
+class _LecturesMenuState extends State<LecturesMenu> {
+  late tts.TextToSpeech tt_speech;
+  late stt.SpeechToText _speech;
+
+  bool _isListening = false;
+  double rate = 0.5;
+
+  _tts(String message) {
+    tt_speech.setRate(rate);
+    tt_speech.speak(message);
+  }
+
+  void _listen() async {
+    if (!_isListening) {
+      bool available = await _speech.initialize(
+        onStatus: (val) => print('onStatus: $val'),
+        onError: (val) => {print('onError: $val')},
+      );
+      if (available) {
+        setState(() => _isListening = true);
+        _speech.listen(
+          onResult: (val) => setState(() {
+            _text = val.recognizedWords;
+            // if (val.hasConfidenceRating && val.confidence > 0) {
+            //   _confidence = val.confidence;
+            // }
+          }),
+        );
+      }
+    } else {
+      setState(() => _isListening = false);
+      _speech.stop();
+    }
+  }
+
+  String _text = 'Speech Text';
+
+  late bool isAdmin;
+
+  @override
+  void initState() {
+    tt_speech = tts.TextToSpeech();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    setState(() {
+      tt_speech.stop();
+      _isListening = false;
+    });
+    // _text = "";
+    // _isListening = false;
+    super.dispose();
+  }
+
+  // var items = [
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,7 +90,7 @@ class LecturesMenu extends StatelessWidget {
             StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance
                     .collection('courses')
-                    .doc(courseId)
+                    .doc(widget.courseId)
                     .collection('lectures')
                     .snapshots(),
                 builder: (BuildContext context,
@@ -56,14 +110,14 @@ class LecturesMenu extends StatelessWidget {
                             document.data()! as Map<String, dynamic>;
                         return GestureDetector(
                           onLongPress: () {
-                            isAdmin!
+                            widget.isAdmin!
                                 ? Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                         builder: (ctx) => EditLectureScreen({
                                               "topic": data['topic'],
                                               "url": data['url'],
-                                              "courseID": courseId,
+                                              "courseID": widget.courseId,
                                               "docID": document.id
                                             }, "lectures")))
                                 : "";
@@ -92,7 +146,43 @@ class LecturesMenu extends StatelessWidget {
             SizedBox(
               height: 15.0,
             ),
-            isAdmin!
+            !widget.isAdmin!
+                ? Container(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: <Widget>[
+                        const Text(
+                          'Please enter your choice',
+                          style: TextStyle(
+                            fontSize: 24.0,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        SizedBox(height: 16.0),
+                        InkWell(
+                          child: _isListening == true
+                              ? Icon(
+                                  Icons.mic,
+                                  size:
+                                      MediaQuery.of(context).size.height * 0.3,
+                                )
+                              : Icon(Icons.mic_off,
+                                  size:
+                                      MediaQuery.of(context).size.height * 0.3),
+                          onTap: () {
+                            tt_speech.stop();
+                            _text = "";
+                            _listen();
+                          },
+                        ),
+                      ],
+                    ),
+                  )
+                : SizedBox(
+                    height: 0,
+                    width: 0,
+                  ),
+            widget.isAdmin!
                 ? Container(
                     width: 300,
                     child: Padding(
@@ -111,7 +201,7 @@ class LecturesMenu extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => UploadPdf(courseId),
+                              builder: (context) => UploadPdf(widget.courseId),
                             ),
                           );
                         },

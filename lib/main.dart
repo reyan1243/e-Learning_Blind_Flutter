@@ -35,11 +35,12 @@ class MyApp extends StatelessWidget {
       ),
       // A widget which will be started on application startup
       home: MyHomePage(),
+      debugShowCheckedModeBanner: false,
       routes: {
         MyHomePage.routeName: (ctx) => MyHomePage(),
         StudentLogin.routeName: (ctx) => StudentLogin(),
         StudentSignup.routeName: (ctx) => StudentSignup(),
-        StudentMenu.routeName: (ctx) => StudentMenu(),
+        StudentMenu.routeName: (ctx) => StudentMenu({}),
         AdminLogin.routeName: (ctx) => AdminLogin(),
         AdminMenu.routeName: (ctx) => AdminMenu(),
         AdminLectures.routeName: (ctx) => AdminLectures(),
@@ -51,7 +52,7 @@ class MyApp extends StatelessWidget {
             ),
         ResultMenu.routeName: (ctx) => ResultMenu(),
         TestsMenu.routeName: (ctx) => TestsMenu(),
-        StudentChat.routeName: (ctx) => StudentChat(),
+        StudentChat.routeName: (ctx) => StudentChat(false, ""),
       },
     );
   }

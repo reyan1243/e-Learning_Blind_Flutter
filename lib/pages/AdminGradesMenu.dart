@@ -38,14 +38,21 @@ class _AdminGradesMenuState extends State<AdminGradesMenu> {
 
   _uploadTask() async {
     try {
-      // var doc = FirebaseFirestore.instance.collection("lectures").doc();
+      // // var doc = FirebaseFirestore.instance.collection("grades").doc();
       // print(doc.id);
-      print(dropdownValue);
+      // print(dropdownValue);
 
       await FirebaseFirestore.instance
           .collection("grades")
           .doc(dropdownValue)
+          .set({
+        "studentID": dropdownValue,
+      });
+
+      await FirebaseFirestore.instance
           .collection("grades")
+          .doc(dropdownValue)
+          .collection("studentgrades")
           .add({"id": idController.text, "desc": descController.text}).then(
               (value) => Fluttertoast.showToast(
                   msg: 'Grade Added!',
@@ -91,7 +98,7 @@ class _AdminGradesMenuState extends State<AdminGradesMenu> {
               ),
               StreamBuilder<QuerySnapshot>(
                   stream: FirebaseFirestore.instance
-                      .collection('grades')
+                      .collection('users')
                       .snapshots(),
                   builder: (BuildContext context,
                       AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -144,80 +151,15 @@ class _AdminGradesMenuState extends State<AdminGradesMenu> {
                                   value.data()! as Map<String, dynamic>;
 
                               return DropdownMenuItem<String>(
-                                value: data['studentId'],
+                                value: data['studentID'],
                                 child:
-                                    FittedBox(child: Text(data['studentId'])),
+                                    FittedBox(child: Text(data['studentID'])),
                               );
                             }).toList(),
                           ),
                         ),
                       ],
                     );
-                    // snapshot.data!.docs.map((DocumentSnapshot document) {
-                    //   Map<String, dynamic> data =
-                    //   document.data()! as Map<String, dynamic>;
-                    //
-                    //
-                    //   // return GestureDetector(
-                    //   //   onTap: () {
-                    //   //     Navigator.push(
-                    //   //         context,
-                    //   //         MaterialPageRoute(
-                    //   //             builder: (ctx) => LecturesMenu(
-                    //   //               isAdmin: true,
-                    //   //               courseId: data['courseID'],
-                    //   //             )));
-                    //   //     // LecturesMenu.routeName);
-                    //   //   },
-                    //   //   child: Container(
-                    //   //     height: 100.0,
-                    //   //     child: Card(
-                    //   //       child: ListTile(
-                    //   //         title: Text('Course: ${data['name']}'),
-                    //   //         subtitle: Text('Desc: ${data['desc']}'),
-                    //   //       ),
-                    //   //     ),
-                    //   //   ),
-                    //   // );
-                    // }).toList();
-
-                    // return Expanded(
-                    //   child: ListView(
-                    //     children:
-                    //         snapshot.data!.docs.map((DocumentSnapshot document) {
-                    //       Map<String, dynamic> data =
-                    //           document.data()! as Map<String, dynamic>;
-                    //       return GestureDetector(
-                    //         onTap: () {
-                    //           Navigator.push(
-                    //               context,
-                    //               MaterialPageRoute(
-                    //                   builder: (ctx) => LecturesMenu(
-                    //                         isAdmin: true,
-                    //                         courseId: data['courseID'],
-                    //                       )));
-                    //           // LecturesMenu.routeName);
-                    //         },
-                    //         child: Container(
-                    //           height: 100.0,
-                    //           child: Card(
-                    //             child: ListTile(
-                    //               title: Text('Course: ${data['name']}'),
-                    //               subtitle: Text('Desc: ${data['desc']}'),
-                    //             ),
-                    //           ),
-                    //         ),
-                    //       );
-                    //     }).toList(),
-                    //
-                    //     // itemCount: items.length,
-                    //     // itemBuilder: (context, index) {
-                    //     //
-                    //     // },
-                    //     // ),
-                    //   ),
-                    //   //},
-                    // );
                   }),
               SizedBox(
                 height: 15.0,
@@ -291,7 +233,8 @@ class _AdminGradesMenuState extends State<AdminGradesMenu> {
                                           setState(() {});
                                         } else {
                                           Fluttertoast.showToast(
-                                              msg: 'Please fill the text boxe!',
+                                              msg:
+                                                  'Please fill the text boxes!',
                                               toastLength: Toast.LENGTH_SHORT,
                                               gravity: ToastGravity.BOTTOM,
                                               backgroundColor: Colors.blueGrey,
@@ -318,71 +261,10 @@ class _AdminGradesMenuState extends State<AdminGradesMenu> {
                       height: 0,
                       width: 0,
                     ),
-              // SizedBox(
-              //   height: 15.0,
-              // ),
-              // Container(
-              //   width: 300,
-              //   child: Padding(
-              //     padding: const EdgeInsets.all(8.0),
-              //     child: ElevatedButton(
-              //       child: const Padding(
-              //         padding: EdgeInsets.all(13.0),
-              //         child: FittedBox(
-              //             child: Text('Add Grade',
-              //                 style: TextStyle(
-              //                     fontSize: 18.0,
-              //                     fontWeight: FontWeight.bold,
-              //                     color: Colors.white))),
-              //       ),
-              //       onPressed: () {
-              //         Navigator.push(
-              //           context,
-              //           MaterialPageRoute(
-              //             builder: (context) => AddCourse(),
-              //           ),
-              //         );
-              //       },
-              //       style: ElevatedButton.styleFrom(
-              //         foregroundColor: Colors.blue,
-              //         shape: RoundedRectangleBorder(
-              //           borderRadius: BorderRadius.circular(18.0),
-              //         ),
-              //       ),
-              //     ),
-              //   ),
-              // ),
             ],
           ),
         ),
       ),
-      // Container(
-      //   child: Padding(
-      //     padding: EdgeInsets.all(10),
-      //     child: Column(
-      //       children: [
-      //         SizedBox(
-      //           height: 15.0,
-      //         ),
-      //         Expanded(
-      //           child: ListView.builder(
-      //             itemCount: items.length,
-      //             itemBuilder: (context, index) {
-      //               return Container(
-      //                 height: 100.0,
-      //                 child: Card(
-      //                   child: ListTile(
-      //                     title: Text(items[index]),
-      //                   ),
-      //                 ),
-      //               );
-      //             },
-      //           ),
-      //         ),
-      //       ],
-      //     ),
-      //   ),
-      // ),
     );
   }
 }

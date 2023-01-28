@@ -3,26 +3,20 @@ import 'package:elearningblind/pages/AddTestAssignment.dart';
 import 'package:elearningblind/pages/EditTestAssignment.dart';
 import 'package:flutter/material.dart';
 
-class TestsMenu extends StatelessWidget {
+class TestsMenu extends StatefulWidget {
   static const routeName = 'TestsMenu';
 
   TestsMenu({this.isAdmin, this.courseId});
 
   bool? isAdmin;
   String? courseId;
-  // var items = [
-  //   "Test 1",
-  //   "Assignment 1",
-  //   "Test 2",
-  //   "Assignment 2",
-  //   "Test 3",
-  //   "Assignment 3",
-  //   "Test 4",
-  //   "Assignment 4",
-  //   "Test 5",
-  //   "Assignment 5",
-  // ];
 
+  @override
+  State<TestsMenu> createState() => _TestsMenuState();
+}
+
+class _TestsMenuState extends State<TestsMenu> {
+  // var items = [
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,7 +33,7 @@ class TestsMenu extends StatelessWidget {
             StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance
                     .collection('courses')
-                    .doc(courseId)
+                    .doc(widget.courseId)
                     .collection('testsassignments')
                     .snapshots(),
                 builder: (BuildContext context,
@@ -67,7 +61,7 @@ class TestsMenu extends StatelessWidget {
                             ),
                             GestureDetector(
                               onLongPress: () {
-                                isAdmin!
+                                widget.isAdmin!
                                     ? Navigator.push(
                                         context,
                                         MaterialPageRoute(
@@ -78,7 +72,7 @@ class TestsMenu extends StatelessWidget {
                                               "desc": data['desc'],
                                               "docID": document.id
                                             },
-                                            courseID: courseId!,
+                                            courseID: widget.courseId!,
                                           ),
                                         ),
                                       )
@@ -132,7 +126,7 @@ class TestsMenu extends StatelessWidget {
                     //},
                   );
                 }),
-            isAdmin!
+            widget.isAdmin!
                 ? Container(
                     width: 300,
                     child: Padding(
@@ -152,7 +146,7 @@ class TestsMenu extends StatelessWidget {
                             context,
                             MaterialPageRoute(
                               builder: (context) => AddTestAssignment(
-                                courseID: courseId!,
+                                courseID: widget.courseId!,
                               ),
                             ),
                           );
