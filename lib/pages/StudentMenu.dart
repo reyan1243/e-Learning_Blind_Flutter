@@ -51,6 +51,7 @@ class _StudentMenuState extends State<StudentMenu> {
   late tts.TextToSpeech tt_speech;
   late String? studentID, name, username;
   double rate = 0.5;
+
   final List<String> _ttsMessages = [
     'Student Menu',
     "Welcome Student",
@@ -99,8 +100,9 @@ class _StudentMenuState extends State<StudentMenu> {
     name = widget.data['name'];
     username = widget.data['username'];
 
-    items[2][1] = GradesMenu(studentID!);
-    items[3][1] = StudentChat(false, username);
+    // items[2][1] = GradesMenu(studentID!);
+    items[1][1] = StudentChat(false, username);
+    items[2][1] = CoursesMenu(isAdmin: false, studentID: studentID);
 
     void speak_messages() async {
       for (int i = 0; i <= _ttsMessages.length; i++) {
@@ -188,6 +190,33 @@ class _StudentMenuState extends State<StudentMenu> {
       appBar: AppBar(
         title: Text('Student Menu'),
         automaticallyImplyLeading: false,
+        actions: [
+          IconButton(
+              icon: const Icon(Icons.logout, color: Colors.white),
+              onPressed: () => showDialog(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                        content: const Text('Do you want to logout?'),
+                        actions: <Widget>[
+                          TextButton(
+                              onPressed: () {
+                                Navigator.of(context)
+                                    .pushReplacementNamed(MyHomePage.routeName);
+                              },
+                              child: const Text(
+                                'Yes',
+                                style: TextStyle(color: Colors.black),
+                              )),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text('No',
+                                style: TextStyle(color: Colors.black)),
+                          ),
+                        ],
+                      ))),
+        ],
       ),
       body: Container(
         padding: EdgeInsets.only(top: 10),
@@ -216,13 +245,13 @@ class _StudentMenuState extends State<StudentMenu> {
                   width: 20.0,
                 ),
                 Column(
-                  children: const [
+                  children: [
                     Text(
                       "Welcome,",
                       style: TextStyle(fontSize: 20),
                     ),
                     Text(
-                      "ABC User",
+                      name!,
                       style: TextStyle(fontSize: 20),
                     ),
                   ],
@@ -293,11 +322,11 @@ class _StudentMenuState extends State<StudentMenu> {
                   InkWell(
                     child: _isListening == true
                         ? Icon(
-                      Icons.mic,
-                      size: MediaQuery.of(context).size.height * 0.3,
-                    )
+                            Icons.mic,
+                            size: MediaQuery.of(context).size.height * 0.3,
+                          )
                         : Icon(Icons.mic_off,
-                        size: MediaQuery.of(context).size.height * 0.3),
+                            size: MediaQuery.of(context).size.height * 0.3),
                     onTap: () {
                       tt_speech.stop();
                       _text = "";
@@ -314,5 +343,3 @@ class _StudentMenuState extends State<StudentMenu> {
     );
   }
 }
-
-

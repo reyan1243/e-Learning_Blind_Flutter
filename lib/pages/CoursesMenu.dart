@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:elearningblind/pages/AddCourse.dart';
+import 'package:elearningblind/pages/AdminCoursesHomePage.dart';
 import 'package:elearningblind/pages/AdminLectures.dart';
 import 'package:elearningblind/pages/AdminMenu.dart';
 import 'package:elearningblind/pages/LecturesMenu.dart';
@@ -13,8 +14,9 @@ class CoursesMenu extends StatelessWidget {
   static const routeName = 'CoursesMenu';
 
   bool isAdmin;
+  String? studentID;
 
-  CoursesMenu({required this.isAdmin});
+  CoursesMenu({required this.isAdmin, this.studentID});
 
   // var items = [
   //   "Lectutres 1",
@@ -59,12 +61,20 @@ class CoursesMenu extends StatelessWidget {
                             document.data()! as Map<String, dynamic>;
                         return GestureDetector(
                           onTap: () {
-                            Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (ctx) => StudentCoursesHomePage(
-                                                  data['courseID']
-                                                )));
+                            isAdmin
+                                ? Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (ctx) => AdminCoursesHomePage(
+                                            data['name'], data['courseID'])))
+                                : Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (ctx) =>
+                                            StudentCoursesHomePage(
+                                                studentID!,
+                                                data['courseID'],
+                                                data['name'])));
                             // isTestMenu
                             //     ? Navigator.push(
                             //         context,

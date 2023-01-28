@@ -14,10 +14,9 @@ import 'package:speech_to_text/speech_to_text.dart' as stt;
 class StudentCoursesHomePage extends StatefulWidget {
   static const routeName = 'StudentCoursesHomePage';
 
-  String courseID;
+  String? studentID, courseID, name;
 
-  StudentCoursesHomePage(this.courseID);
-
+  StudentCoursesHomePage(this.studentID, this.courseID, this.name);
 
   @override
   State<StudentCoursesHomePage> createState() => _StudentCoursesHomePageState();
@@ -31,15 +30,14 @@ class _StudentCoursesHomePageState extends State<StudentCoursesHomePage> {
       0: "Test & Assignments",
       1: TestsMenu(
         isAdmin: false,
-        courseId: "",
+        courseID: "",
       )
     },
-    {0: "Grades", 1: GradesMenu("")},
-    {0: "Lectures", 1: LecturesMenu(
-
-    )},
-
+    {0: "Grades", 1: GradesMenu(false, "", "")},
+    {0: "Lectures", 1: LecturesMenu()},
   ];
+
+  String name = "";
 
   late stt.SpeechToText _speech;
   bool _isListening = false;
@@ -91,11 +89,16 @@ class _StudentCoursesHomePageState extends State<StudentCoursesHomePage> {
   void initState() {
     tt_speech = tts.TextToSpeech();
     _speech = stt.SpeechToText();
+    name = widget.name!;
 
     items[0][1] = TestsMenu(
       isAdmin: false,
-      courseId: widget.courseID,
+      courseID: widget.courseID,
+      studentID: widget.studentID,
     );
+
+    items[1][1] = GradesMenu(false, widget.courseID!, widget.studentID!);
+    items[2][1] = LecturesMenu(isAdmin: false, courseID: widget.courseID);
 
     // void speak_messages() async {
     //   for (int i = 0; i <= _ttsMessages.length; i++) {
@@ -170,19 +173,9 @@ class _StudentCoursesHomePageState extends State<StudentCoursesHomePage> {
         Navigator.pushNamed(context, StudentChat.routeName);
       });
     }
-    //   else if (_text == 'grades') {
-    //   setState(() {
-    //     _isListening = false;
-    //   });
-    //   SchedulerBinding.instance.addPostFrameCallback((_) {
-    //     Navigator.pushNamed(context, Grad.routeName);
-    //   });
-    // }
-
     return Scaffold(
       appBar: AppBar(
         title: Text('Student Menu'),
-        automaticallyImplyLeading: false,
       ),
       body: Container(
         padding: EdgeInsets.only(top: 10),
@@ -190,34 +183,21 @@ class _StudentCoursesHomePageState extends State<StudentCoursesHomePage> {
           children: [
             Row(
               children: [
-                // const SizedBox(
-                //   width: 6.0,
-                // ),
-                // Container(
-                //   // padding: EdgeInsets.all(4),
-                //   width: 50,
-                //   height: 50,
-                //   decoration: const BoxDecoration(
-                //     shape: BoxShape.circle,
-                //     image: DecorationImage(
-                //       fit: BoxFit.fill,
-                //       image: NetworkImage(
-                //         'https://media.licdn.com/dms/image/C4D03AQFLPbgktVGZBQ/profile-displayphoto-shrink_800_800/0/1656325697250?e=1678320000&v=beta&t=Cyn-c8j-csmO-Nuc6vhOWX1uoKPRYHv5Qe7GXwLeKXo',
-                //       ),
-                //     ),
-                //   ),
-                // ),
                 const SizedBox(
                   width: 20.0,
                 ),
                 Column(
-                  children: const [
+                  children: [
                     Text(
-                      "Welcome,",
-                      style: TextStyle(fontSize: 20),
+                      "Course Name:",
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(
+                      height: 10.0,
                     ),
                     Text(
-                      "ABC User",
+                      name,
                       style: TextStyle(fontSize: 20),
                     ),
                   ],
@@ -288,11 +268,11 @@ class _StudentCoursesHomePageState extends State<StudentCoursesHomePage> {
                   InkWell(
                     child: _isListening == true
                         ? Icon(
-                      Icons.mic,
-                      size: MediaQuery.of(context).size.height * 0.3,
-                    )
+                            Icons.mic,
+                            size: MediaQuery.of(context).size.height * 0.3,
+                          )
                         : Icon(Icons.mic_off,
-                        size: MediaQuery.of(context).size.height * 0.3),
+                            size: MediaQuery.of(context).size.height * 0.3),
                     onTap: () {
                       tt_speech.stop();
                       _text = "";

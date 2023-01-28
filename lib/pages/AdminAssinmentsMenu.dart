@@ -1,30 +1,40 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:elearningblind/pages/AddAnnouncements.dart';
+import 'package:elearningblind/pages/AddGrade.dart';
 import 'package:elearningblind/pages/EditAnnouncements.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:text_to_speech/text_to_speech.dart' as tts;
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
-class AdminAssignentsMenu extends StatefulWidget {
-  bool? isAdmin;
+class AdminAssignmentsMenu extends StatefulWidget {
+  AdminAssignmentsMenu({required this.data});
 
-  AdminAssignentsMenu(this.isAdmin);
+  Map<String, dynamic> data;
 
-  static const routeName = 'AnnouncementsMenu';
+  static const routeName = 'AdminAssignmentsMenu';
 
   @override
-  State<AdminAssignentsMenu> createState() => _AdminAssignentsMenuState();
+  State<AdminAssignmentsMenu> createState() => _AdminAssignmentsMenuState();
 }
 
-class _AdminAssignentsMenuState extends State<AdminAssignentsMenu> {
+class _AdminAssignmentsMenuState extends State<AdminAssignmentsMenu> {
+  String? courseID, assignmentID;
+
+  @override
+  void initState() {
+    courseID = widget.data['courseID'];
+    // studentID = widget.data['studentID'];
+    // descController.text = widget.data['desc'];
+    assignmentID = widget.data['docID'];
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-
-
     return Scaffold(
       appBar: AppBar(
-        title: Text('Assignments Menu'),
+        title: Text('Answers Menu'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(10),
@@ -35,7 +45,11 @@ class _AdminAssignentsMenuState extends State<AdminAssignentsMenu> {
             ),
             StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance
-                    .collection('announcements')
+                    .collection('courses')
+                    .doc(courseID)
+                    .collection('testsassignments')
+                    .doc(assignmentID)
+                    .collection('answers')
                     .snapshots(),
                 builder: (BuildContext context,
                     AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -46,28 +60,6 @@ class _AdminAssignentsMenuState extends State<AdminAssignentsMenu> {
                     return Text("Loading");
                   }
 
-                  var _ttsMessages =
-                      snapshot.data!.docs.map((DocumentSnapshot document) {
-                    Map<String, dynamic> data =
-                        document.data()! as Map<String, dynamic>;
-                    return data['desc'].toString();
-                  }).toList();
-
-                  // void speak_messages() async {
-                  //   for (int i = 0; i <= _ttsMessages.length; i++) {
-                  //     await Future.delayed(const Duration(milliseconds: 3000),
-                  //         () {
-                  //       _tts(_ttsMessages[i]);
-                  //     });
-                  //   }
-                    //
-                    // await Future.delayed(const Duration(milliseconds: 2000), () {
-                    //   _listen();
-                    // });
-                  // }
-
-                  // speak_messages();
-
                   return Expanded(
                     child: ListView(
                       children:
@@ -75,9 +67,45 @@ class _AdminAssignentsMenuState extends State<AdminAssignentsMenu> {
                         Map<String, dynamic> data =
                             document.data()! as Map<String, dynamic>;
                         return GestureDetector(
+                          onTap: () async {
+                            bool exists = false;
+
+                            await FirebaseFirestore.instance
+                                .collection('courses')
+                                .doc(courseID)
+                                .collection('grades')
+                                .where("assignmentID", isEqualTo: assignmentID)
+                                .where("studentID",
+                                    isEqualTo: data['studentID'])
+                                .get()
+                                .then((doc) {
+                              if (doc.docs.isNotEmpty) {
+                                exists = true;
+                                Fluttertoast.showToast(
+                                    msg: 'Grade Exists!',
+                                    toastLength: Toast.LENGTH_SHORT,
+                                    gravity: ToastGravity.BOTTOM,
+                                    backgroundColor: Colors.blueGrey,
+                                    textColor: Colors.white);
+                              } else {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => AddGrade({
+                                      "answerID": document.id,
+                                      "assignmentID": assignmentID,
+                                      "studentID": data['studentID'],
+                                      "courseID": courseID,
+                                    }),
+                                  ),
+                                );
+                              }
+                            });
+                          },
                           // onLongPress: () {
                           //   isAdmin
-                          //       ? Navigator.push(
+                          //       ?
+                          //       Navigator.push(
                           //           context,
                           //           MaterialPageRoute(
                           //             builder: (context) => EditAnnouncements({
@@ -88,11 +116,23 @@ class _AdminAssignentsMenuState extends State<AdminAssignentsMenu> {
                           //         )
                           //       : "";
                           // },
-                          child: Container(
-                            height: 100.0,
-                            child: Card(
-                              child: ListTile(
-                                title: Text(data['desc']),
+                          //todo: add checklist to check if answer exists
+                          child: Expanded(
+                            child: Container(
+                              height: 100.0,
+                              child: Card(
+                                child: ListTile(
+                                  title: FittedBox(
+                                    child: Column(
+                                      children: [
+                                        Text("StudentID: ${data['studentID']}"),
+                                        Text(
+                                            "AssignmentID: ${data['assignmentID']}")
+                                      ],
+                                    ),
+                                  ),
+                                  subtitle: Text("Answer: ${data['answer']}"),
+                                ),
                               ),
                             ),
                           ),
@@ -108,7 +148,6 @@ class _AdminAssignentsMenuState extends State<AdminAssignentsMenu> {
                     //},
                   );
                 }),
-
           ],
         ),
       ),

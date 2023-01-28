@@ -1,16 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:elearningblind/pages/AddAnswer.dart';
 import 'package:elearningblind/pages/AddTestAssignment.dart';
+import 'package:elearningblind/pages/AdminAssinmentsMenu.dart';
 import 'package:elearningblind/pages/EditTestAssignment.dart';
 import 'package:flutter/material.dart';
 
 class TestsMenu extends StatefulWidget {
   static const routeName = 'TestsMenu';
 
-  TestsMenu({this.isAdmin, this.courseId});
+  TestsMenu({this.isAdmin, this.courseID, this.studentID});
 
   bool? isAdmin;
-  String? courseId;
+  String? courseID, studentID;
 
   @override
   State<TestsMenu> createState() => _TestsMenuState();
@@ -34,7 +35,7 @@ class _TestsMenuState extends State<TestsMenu> {
             StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance
                     .collection('courses')
-                    .doc(widget.courseId)
+                    .doc(widget.courseID)
                     .collection('testsassignments')
                     .snapshots(),
                 builder: (BuildContext context,
@@ -61,20 +62,36 @@ class _TestsMenuState extends State<TestsMenu> {
                                   fontWeight: FontWeight.bold, fontSize: 25),
                             ),
                             GestureDetector(
-                              onTap: (){
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        AddAnswer(
-                                          data: {
-                                            "docID": document.id,
-                                            "studentID": ""//todo: student id,
-                                          },
-                                          courseID: widget.courseId!,
-                                        )
-                                  ),
-                                );
+                              onTap: () {
+                                //todo: check if answer exists
+
+                                widget.isAdmin!
+                                    ? Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                AdminAssignmentsMenu(
+                                                  data: {
+                                                    "docID": document.id,
+                                                    // "studentID": widget.studentID,
+                                                    "courseID":
+                                                        widget.courseID!,
+                                                  },
+                                                )),
+                                      )
+                                    : Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => AddAnswer(
+                                                  data: {
+                                                    "docID": document.id,
+                                                    "studentID":
+                                                        widget.studentID,
+                                                    "courseID":
+                                                        widget.courseID!,
+                                                  },
+                                                )),
+                                      );
                               },
                               onLongPress: () {
                                 widget.isAdmin!
@@ -88,7 +105,7 @@ class _TestsMenuState extends State<TestsMenu> {
                                               "desc": data['desc'],
                                               "docID": document.id
                                             },
-                                            courseID: widget.courseId!,
+                                            courseID: widget.courseID!,
                                           ),
                                         ),
                                       )
@@ -162,7 +179,7 @@ class _TestsMenuState extends State<TestsMenu> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => AddTestAssignment(
-                                courseID: widget.courseId!,
+                                courseID: widget.courseID!,
                               ),
                             ),
                           );

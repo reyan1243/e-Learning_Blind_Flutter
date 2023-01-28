@@ -8,9 +8,8 @@ import '../components/input_field.dart';
 class AddAnswer extends StatefulWidget {
   static const routeName = 'AddAnswer';
 
-  AddAnswer({required this.data, this.courseID});
+  AddAnswer({required this.data});
 
-  String? courseID;
   Map<String, dynamic> data;
 
   @override
@@ -18,17 +17,16 @@ class AddAnswer extends StatefulWidget {
 }
 
 class _AddAnswerState extends State<AddAnswer> {
-
-  String? courseID, docID;
+  String? courseID, docID, studentID;
 
   @override
   void initState() {
-    courseID = widget.courseID;
-    descController.text = widget.data['desc'];
+    courseID = widget.data['courseID'];
+    studentID = widget.data['studentID'];
+    // descController.text = widget.data['desc'];
     docID = widget.data['docID'];
     super.initState();
   }
-
 
   @override
   void dispose() {
@@ -53,7 +51,7 @@ class _AddAnswerState extends State<AddAnswer> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Add Announcement"),
+        title: Text("Add Answer"),
       ),
       body: SingleChildScrollView(
         child: Form(
@@ -67,6 +65,7 @@ class _AddAnswerState extends State<AddAnswer> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     InputField(
+                      maxLine: 10,
                       textValueController: descController,
                       node: descNode,
                       label: 'Answer',
@@ -77,7 +76,7 @@ class _AddAnswerState extends State<AddAnswer> {
                       ),
                       onValidate: (val) {
                         if (val.isEmpty) {
-                          return 'Please provide a desc';
+                          return 'Please provide an answer';
                         } else {
                           return null;
                         }
@@ -102,12 +101,11 @@ class _AddAnswerState extends State<AddAnswer> {
                           ),
                           onPressed: () async {
                             if (
-                            // nameController.text.isNotEmpty &&
-                            descController.text.isNotEmpty) {
+                                // nameController.text.isNotEmpty &&
+                                descController.text.isNotEmpty) {
                               _submit();
                               setState(() {});
                             } else {
-
                               // Fluttertoast.showToast(
                               //     msg: 'Please fill the text boxe!',
                               //     toastLength: Toast.LENGTH_SHORT,
@@ -144,19 +142,51 @@ class _AddAnswerState extends State<AddAnswer> {
 
   _uploadTask() async {
     try {
-      var doc = FirebaseFirestore.instance.collection("announcements").doc();
-      print(doc.id);
+      // var doc = FirebaseFirestore.instance
+      //     .collection('courses')
+      //     .doc(courseID)
+      //     .collection('testsassignments')
+      //     .doc(docID)
+      //     .collection('answers')
+      //     .doc();
+      // print(doc.id);
+
+      bool exists = false;
 
       await FirebaseFirestore.instance
-          .collection("announcements")
-          .doc(doc.id)
-          .set({"id": doc.id, "desc": descController.text}).then((value) =>
-          Fluttertoast.showToast(
-              msg: 'Announcement Added!',
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.BOTTOM,
-              backgroundColor: Colors.blueGrey,
-              textColor: Colors.white));
+          .collection('courses')
+          .doc(courseID)
+          .collection('testsassignments')
+          .doc(docID)
+          .collection('answers')
+          .where("studentID", isEqualTo: studentID)
+          .get()
+          .then((doc) {
+        if (doc.docs.isNotEmpty) {
+          print("answer Exists"); //todo: add message
+          exists = true;
+        }
+      });
+
+      if (!exists) {
+        await FirebaseFirestore.instance
+            .collection('courses')
+            .doc(courseID)
+            .collection('testsassignments')
+            .doc(docID)
+            .collection('answers')
+            .add({
+          "studentID": studentID,
+          "assignmentID": docID,
+          "courseID": courseID,
+          "answer": descController.text
+        }).then((value) => Fluttertoast.showToast(
+                msg: 'Answer Submitted!',
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.BOTTOM,
+                backgroundColor: Colors.blueGrey,
+                textColor: Colors.white));
+      }
 
       Navigator.pop(context);
     } on PlatformException catch (er) {

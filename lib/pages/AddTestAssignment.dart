@@ -14,7 +14,9 @@ class AddTestAssignment extends StatefulWidget {
 }
 
 class _AddTestAssignmentState extends State<AddTestAssignment> {
-  String? courseID;
+  String? courseID, dropdownValue;
+  bool isSelected = false;
+  List<String> itemtypes = ["Test", "Assignment"];
 
   @override
   void initState() {
@@ -116,6 +118,37 @@ class _AddTestAssignmentState extends State<AddTestAssignment> {
                     SizedBox(
                       height: screenH * 0.05,
                     ),
+                    DropdownButton<String>(
+                      hint: Text("Select"),
+                      borderRadius: BorderRadius.circular(8),
+                      value: dropdownValue,
+                      icon: const Icon(Icons.arrow_drop_down),
+                      elevation: 8,
+                      style: const TextStyle(fontSize: 18, color: Colors.black),
+                      // underline: DropdownButtonHideUnderline(
+                      //   child: Container(),
+                      // ),
+                      onChanged: (value) {
+                        setState(() {
+                          isSelected = true;
+                          dropdownValue = value!;
+                        });
+                      },
+                      items: itemtypes
+                          .map((item) => DropdownMenuItem<String>(
+                                value: item,
+                                child: FittedBox(child: Text(item)),
+                              ))
+                          .toList(),
+                      //   {
+                      //
+                      //   return DropdownMenuItem<String>(
+                      //     value: data['studentID'],
+                      //     child:
+                      //     FittedBox(child: Text(data['studentID'])),
+                      //   );
+                      // }).toList(),
+                    ),
                     Container(
                       width: 300,
                       child: Padding(
@@ -132,7 +165,8 @@ class _AddTestAssignmentState extends State<AddTestAssignment> {
                           ),
                           onPressed: () async {
                             if (questionController.text.isNotEmpty &&
-                                descController.text.isNotEmpty) {
+                                descController.text.isNotEmpty &&
+                                dropdownValue != null) {
                               _submit();
                               setState(() {});
                             } else {
@@ -173,24 +207,30 @@ class _AddTestAssignmentState extends State<AddTestAssignment> {
 
   _uploadTask() async {
     try {
-      // var doc = FirebaseFirestore.instance.collection("courses").doc();
-      // print(doc.id);
+      var doc = FirebaseFirestore.instance
+          .collection("courses")
+          .doc(courseID)
+          .collection("testsassignments")
+          .doc();
+      print(doc.id);
 
       await FirebaseFirestore.instance
           .collection("courses")
           .doc(courseID)
           .collection("testsassignments")
-          .add({
-        "id": 123,
+          .doc(doc.id)
+          .set({
+        "id": doc.id,
         "question": questionController.text,
         "desc": descController.text,
-        "isTest": false,
+        "isTest": dropdownValue == "Test" ? true : false,
       }).then((value) => Fluttertoast.showToast(
               msg: 'Data Added!',
               toastLength: Toast.LENGTH_SHORT,
               gravity: ToastGravity.BOTTOM,
               backgroundColor: Colors.blueGrey,
               textColor: Colors.white));
+
       Navigator.pop(context);
     } on PlatformException catch (er) {
       print(er.message);

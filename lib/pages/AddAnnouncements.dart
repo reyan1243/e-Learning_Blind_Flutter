@@ -53,23 +53,6 @@ class _AddAnnouncementsState extends State<AddAnnouncements> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // InputField(
-                    //   textValueController: nameController,
-                    //   node: nameNode,
-                    //   label: 'Name',
-                    //   hint: 'Add Course Name',
-                    //   suffixIcon: const SizedBox(
-                    //     height: 0.0,
-                    //     width: 0.0,
-                    //   ),
-                    //   onValidate: (val) {
-                    //     if (val.isEmpty) {
-                    //       return 'Please provide a name';
-                    //     } else {
-                    //       return null;
-                    //     }
-                    //   },
-                    // ),
                     InputField(
                       textValueController: descController,
                       node: descNode,
@@ -153,13 +136,16 @@ class _AddAnnouncementsState extends State<AddAnnouncements> {
       await FirebaseFirestore.instance
           .collection("announcements")
           .doc(doc.id)
-          .set({"id": doc.id, "desc": descController.text}).then((value) =>
-              Fluttertoast.showToast(
-                  msg: 'Announcement Added!',
-                  toastLength: Toast.LENGTH_SHORT,
-                  gravity: ToastGravity.BOTTOM,
-                  backgroundColor: Colors.blueGrey,
-                  textColor: Colors.white));
+          .set({
+        "id": doc.id,
+        "desc": descController.text,
+        "createdAt": DateTime.now(),
+      }).then((value) => Fluttertoast.showToast(
+              msg: 'Announcement Added!',
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.BOTTOM,
+              backgroundColor: Colors.blueGrey,
+              textColor: Colors.white));
 
       Navigator.pop(context);
     } on PlatformException catch (er) {

@@ -4,12 +4,15 @@ import 'package:elearningblind/pages/UploadPdf.dart';
 import 'package:flutter/material.dart';
 
 class LecturesMenu extends StatelessWidget {
-  LecturesMenu({this.isAdmin, this.courseId});
+  LecturesMenu({
+    this.isAdmin,
+    this.courseID,
+  });
 
   static const routeName = 'LecturesMenu';
 
   bool? isAdmin;
-  String? courseId;
+  String? courseID;
 
   // var items = [
   //   "Lectutres 1",
@@ -36,7 +39,7 @@ class LecturesMenu extends StatelessWidget {
             StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance
                     .collection('courses')
-                    .doc(courseId)
+                    .doc(courseID)
                     .collection('lectures')
                     .snapshots(),
                 builder: (BuildContext context,
@@ -63,7 +66,7 @@ class LecturesMenu extends StatelessWidget {
                                         builder: (ctx) => EditLectureScreen({
                                               "topic": data['topic'],
                                               "url": data['url'],
-                                              "courseID": courseId,
+                                              "courseID": courseID,
                                               "docID": document.id
                                             }, "lectures")))
                                 : "";
@@ -111,7 +114,7 @@ class LecturesMenu extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => UploadPdf(courseId),
+                              builder: (context) => UploadPdf(courseID),
                             ),
                           );
                         },

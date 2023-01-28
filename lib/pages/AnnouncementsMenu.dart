@@ -110,9 +110,11 @@ class _AnnouncementsMenuState extends State<AnnouncementsMenu> {
             const SizedBox(
               height: 15.0,
             ),
+            //todo: order by date (less than 2 days)
             StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance
                     .collection('announcements')
+                    .orderBy("createdAt", descending: true)
                     .snapshots(),
                 builder: (BuildContext context,
                     AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -123,27 +125,29 @@ class _AnnouncementsMenuState extends State<AnnouncementsMenu> {
                     return Text("Loading");
                   }
 
-                  var _ttsMessages =
-                      snapshot.data!.docs.map((DocumentSnapshot document) {
-                    Map<String, dynamic> data =
-                        document.data()! as Map<String, dynamic>;
-                    return data['desc'].toString();
-                  }).toList();
+                  if (!isAdmin) {
+                    var _ttsMessages =
+                        snapshot.data!.docs.map((DocumentSnapshot document) {
+                      Map<String, dynamic> data =
+                          document.data()! as Map<String, dynamic>;
+                      return data['desc'].toString();
+                    }).toList();
 
-                  void speak_messages() async {
-                    for (int i = 0; i <= _ttsMessages.length; i++) {
-                      await Future.delayed(const Duration(milliseconds: 3000),
-                          () {
-                        _tts(_ttsMessages[i]);
-                      });
+                    void speak_messages() async {
+                      for (int i = 0; i <= _ttsMessages.length; i++) {
+                        await Future.delayed(const Duration(milliseconds: 3000),
+                            () {
+                          _tts(_ttsMessages[i]);
+                        });
+                      }
+                      //
+                      // await Future.delayed(const Duration(milliseconds: 2000), () {
+                      //   _listen();
+                      // });
                     }
-                    //
-                    // await Future.delayed(const Duration(milliseconds: 2000), () {
-                    //   _listen();
-                    // });
-                  }
 
-                  speak_messages();
+                    speak_messages();
+                  }
 
                   return Expanded(
                     child: ListView(
