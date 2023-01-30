@@ -24,8 +24,6 @@ class StudentCoursesHomePage extends StatefulWidget {
 
 class _StudentCoursesHomePageState extends State<StudentCoursesHomePage> {
   var items = [
-    //Announcement,courses(lectures-update-to-courses),Messages
-    // {0: "Announcements", 1: AnnouncementsMenu(false)},
     {
       0: "Test & Assignments",
       1: TestsMenu(
@@ -46,14 +44,12 @@ class _StudentCoursesHomePageState extends State<StudentCoursesHomePage> {
 
   double rate = 0.5;
 
-  // final List<String> _ttsMessages = [
-  //   'Student Menu',
-  //   "Welcome Student",
-  //   "Announcements",
-  //   "Messages",
-  //   "Courses",
-  //   "Select Your Choice"
-  // ];
+  final List<String> _ttsMessages = [
+    "Tests and Assignments",
+    "Grade",
+    "Lectures",
+    "Select Your Choice"
+  ];
 
   _tts(String message) {
     tt_speech.setRate(rate);
@@ -100,19 +96,21 @@ class _StudentCoursesHomePageState extends State<StudentCoursesHomePage> {
     items[1][1] = GradesMenu(false, widget.courseID!, widget.studentID!);
     items[2][1] = LecturesMenu(isAdmin: false, courseID: widget.courseID);
 
-    // void speak_messages() async {
-    //   for (int i = 0; i <= _ttsMessages.length; i++) {
-    //     await Future.delayed(const Duration(milliseconds: 3000), () {
-    //       _tts(_ttsMessages[i]);
-    //     });
-    //   }
-    //   //
-    //   // await Future.delayed(const Duration(milliseconds: 2000), () {
-    //   //   _listen();
-    //   // });
-    // }
+    void speak_messages() async {
+      _tts("Course ${name}");
+      for (int i = 0; i <= _ttsMessages.length; i++) {
+        await Future.delayed(const Duration(milliseconds: 3000), () {
+          _tts(_ttsMessages[i]);
+        });
+      }
 
-    // speak_messages();
+      //
+      // await Future.delayed(const Duration(milliseconds: 2000), () {
+      //   _listen();
+      // });
+    }
+
+    speak_messages();
     super.initState();
   }
 
@@ -130,13 +128,15 @@ class _StudentCoursesHomePageState extends State<StudentCoursesHomePage> {
       setState(() {
         _isListening = false;
       });
+      tt_speech.stop();
       SchedulerBinding.instance.addPostFrameCallback((_) {
         Navigator.pop(context);
       });
-    } else if (_text == 'tests') {
+    } else if (_text == 'assignments') {
       setState(() {
         _isListening = false;
       });
+      tt_speech.stop();
       SchedulerBinding.instance.addPostFrameCallback((_) {
         Navigator.push(
           context,
@@ -153,6 +153,7 @@ class _StudentCoursesHomePageState extends State<StudentCoursesHomePage> {
       setState(() {
         _isListening = false;
       });
+      tt_speech.stop();
       SchedulerBinding.instance.addPostFrameCallback((_) {
         Navigator.push(
           context,
@@ -166,6 +167,7 @@ class _StudentCoursesHomePageState extends State<StudentCoursesHomePage> {
       setState(() {
         _isListening = false;
       });
+      tt_speech.stop();
       SchedulerBinding.instance.addPostFrameCallback((_) {
         Navigator.push(
           context,
@@ -178,7 +180,7 @@ class _StudentCoursesHomePageState extends State<StudentCoursesHomePage> {
     }
     return Scaffold(
       appBar: AppBar(
-        title: Text('Course Homepage'),
+        title: const Text('Course Homepage'),
       ),
       body: Container(
         padding: EdgeInsets.only(top: 10),
@@ -191,7 +193,7 @@ class _StudentCoursesHomePageState extends State<StudentCoursesHomePage> {
                 ),
                 Column(
                   children: [
-                    Text(
+                    const Text(
                       "Course Name:",
                       style:
                           TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -207,17 +209,17 @@ class _StudentCoursesHomePageState extends State<StudentCoursesHomePage> {
                 ),
               ],
             ),
-            SizedBox(
+            const SizedBox(
               height: 15.0,
             ),
             Expanded(
               child: Container(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                     color: Colors.grey,
                     borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(60),
                         topRight: Radius.circular(60))),
-                padding: EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
                 // color: Colors.grey,
                 child: ListView.builder(
                   itemCount: items.length,
@@ -267,7 +269,7 @@ class _StudentCoursesHomePageState extends State<StudentCoursesHomePage> {
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  SizedBox(height: 16.0),
+                  const SizedBox(height: 16.0),
                   InkWell(
                     child: _isListening == true
                         ? Icon(
@@ -280,7 +282,6 @@ class _StudentCoursesHomePageState extends State<StudentCoursesHomePage> {
                       tt_speech.stop();
                       _text = "";
                       _listen();
-                      print(_text);
                     },
                   ),
                 ],

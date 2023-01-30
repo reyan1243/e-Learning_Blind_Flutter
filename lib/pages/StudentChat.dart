@@ -59,11 +59,56 @@ class _StudentChatState extends State<StudentChat> {
   }
 
   String _text = 'Speech Text';
+  var _ttsMessages = [];
+  var _ttsMessages1 = [];
+  late Stream<QuerySnapshot> stream2;
 
   @override
   void initState() {
     tt_speech = tts.TextToSpeech();
     _speech = stt.SpeechToText();
+    _tts("Messages Screen");
+
+    stream2 = FirebaseFirestore.instance
+        .collection('messages')
+        .orderBy('timestamp', descending: true)
+        .snapshots();
+
+    if (!widget.isAdmin) {
+      void getData() async {
+        await FirebaseFirestore.instance
+            .collection('messages')
+            .orderBy('timestamp', descending: true)
+            .get()
+            .then((doc) {
+          for (int i = 0; i < 4; i++) {
+            print(doc.docs[i]['text']);
+            _ttsMessages.add(doc.docs[i]['text']);
+            _ttsMessages1.add(doc.docs[i]['sender']);
+          }
+        });
+      }
+
+      getData();
+
+      void speak_messages() async {
+        for (int i = 0; i <= _ttsMessages.length; i++) {
+          // t1 = Timer(Duration(seconds: 3), () {
+          //   _tts(_ttsMessages[i]);
+          // });
+          await Future.delayed(const Duration(milliseconds: 3000), () {
+            _tts(_ttsMessages[i]);
+          });
+          await Future.delayed(const Duration(milliseconds: 2000), () {
+            _tts(_ttsMessages1[i]);
+          });
+        }
+      }
+
+      speak_messages();
+      //
+
+    }
 
     super.initState();
   }
@@ -125,10 +170,7 @@ class _StudentChatState extends State<StudentChat> {
         child: Column(
           children: [
             StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance
-                  .collection('messages')
-                  .orderBy('timestamp', descending: true)
-                  .snapshots(),
+              stream: stream2,
               builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (!snapshot.hasData) {
                   return const Center(
@@ -143,6 +185,7 @@ class _StudentChatState extends State<StudentChat> {
                 for (DocumentSnapshot message in messages!) {
                   Map<String, dynamic> message1 =
                       message.data()! as Map<String, dynamic>;
+
                   final messageText = message1['text'];
                   final messageSender = message1['sender'] ?? "User";
 

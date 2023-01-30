@@ -56,29 +56,67 @@ class _LecturesMenuState extends State<LecturesMenu> {
   }
 
   String _text = 'Speech Text';
+  late Stream<QuerySnapshot> stream2;
+  var _ttsMessages = [];
+
   @override
   void initState() {
+    stream2 = FirebaseFirestore.instance
+        .collection('courses')
+        .doc(widget.courseID)
+        .collection('lectures')
+        .snapshots();
+
     tt_speech = tts.TextToSpeech();
     _speech = stt.SpeechToText();
-    SchedulerBinding.instance.addPostFrameCallback((_) {
+
+    _tts("Lectures Screen");
+
+    void getData() async {
+      await FirebaseFirestore.instance
+          .collection('courses')
+          .doc(widget.courseID)
+          .collection('lectures')
+          .get()
+          .then((doc) {
+        doc.docs.forEach((data) {
+          _ttsMessages.add(data['topic']);
+        });
+      });
+    }
+
+    if (!widget.isAdmin!) {
+      getData();
+
+      void speak_messages() async {
+        for (int i = 0; i <= _ttsMessages.length; i++) {
+          // t1 = Timer(Duration(seconds: 3), () {
+          //   _tts(_ttsMessages[i]);
+          // });
+          await Future.delayed(const Duration(milliseconds: 3000), () {
+            _tts(_ttsMessages[i]);
+          });
+        }
+      }
+
       speak_messages();
-    });
+      //
+
+    }
     super.initState();
   }
 
-  late var _ttsMessages = [];
-
-  void speak_messages() async {
-    for (int i = 0; i <= _ttsMessages.length; i++) {
-      await Future.delayed(const Duration(milliseconds: 3000), () {
-        _tts(_ttsMessages[i]);
-      });
-    }
-    //
-    // await Future.delayed(const Duration(milliseconds: 2000), () {
-    //   _listen();
-    // });
-  }
+  // void speak_messages() async {
+  //   for (int i = 0; i <= _ttsMessages.length; i++) {
+  //     await Future.delayed(const Duration(milliseconds: 3000), () {
+  //       _tts(_ttsMessages[i]);
+  //     });
+  //   }
+  //   //
+  //   // await Future.delayed(const Duration(milliseconds: 2000), () {
+  //   //   _listen();
+  //   // });
+  // }
 
   // var items = [
   @override
@@ -105,11 +143,7 @@ class _LecturesMenuState extends State<LecturesMenu> {
               height: 15.0,
             ),
             StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('courses')
-                    .doc(widget.courseID)
-                    .collection('lectures')
-                    .snapshots(),
+                stream: stream2,
                 builder: (BuildContext context,
                     AsyncSnapshot<QuerySnapshot> snapshot) {
                   if (snapshot.hasError) {
@@ -119,14 +153,14 @@ class _LecturesMenuState extends State<LecturesMenu> {
                     return Text("Loading");
                   }
 
-                  if (!widget.isAdmin!) {
-                    _ttsMessages =
-                        snapshot.data!.docs.map((DocumentSnapshot document) {
-                      Map<String, dynamic> data =
-                          document.data()! as Map<String, dynamic>;
-                      return data['topic'].toString();
-                    }).toList();
-                  }
+                  // if (!widget.isAdmin!) {
+                  //   _ttsMessages =
+                  //       snapshot.data!.docs.map((DocumentSnapshot document) {
+                  //     Map<String, dynamic> data =
+                  //         document.data()! as Map<String, dynamic>;
+                  //     return data['topic'].toString();
+                  //   }).toList();
+                  // }
 
                   return Expanded(
                     child: ListView.builder(

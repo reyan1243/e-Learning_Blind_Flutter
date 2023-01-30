@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:elearningblind/pages/AddAnswer.dart';
 import 'package:elearningblind/pages/AddTestAssignment.dart';
@@ -29,6 +31,7 @@ class _TestsMenuState extends State<TestsMenu> {
   double rate = 0.5;
 
   _tts(String message) {
+    tt_speech.stop();
     tt_speech.setRate(rate);
     tt_speech.speak(message);
   }
@@ -58,7 +61,38 @@ class _TestsMenuState extends State<TestsMenu> {
     }
   }
 
+  late Stream<QuerySnapshot> _mystream;
   // = "GRh0HYFhGk106N7qOzTH";
+
+  void validate(docID) async {
+    await FirebaseFirestore.instance
+        .collection('courses')
+        .doc(widget.courseID)
+        .collection('testsassignments')
+        .doc(docID)
+        .collection("answers")
+        // .where("assignmentID",
+        //     isEqualTo: document.id)
+        .where("studentID", isEqualTo: widget.studentID)
+        .get()
+        .then((doc) {
+      if (doc.docs.isNotEmpty) {
+        _tts("Answer already submitted");
+      } else {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => AddAnswer(
+                    data: {
+                      "docID": docID,
+                      "studentID": widget.studentID,
+                      "courseID": widget.courseID!,
+                    },
+                  )),
+        );
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -68,16 +102,63 @@ class _TestsMenuState extends State<TestsMenu> {
     super.dispose();
   }
 
+  var _ttsMessages = [];
+  var _ttsMessages1 = [];
+
   @override
   void initState() {
+    _mystream = FirebaseFirestore.instance
+        .collection('courses')
+        .doc(widget.courseID)
+        .collection('testsassignments')
+        .snapshots();
     tt_speech = tts.TextToSpeech();
     _speech = stt.SpeechToText();
+
+    if (!widget.isAdmin!) {
+      void getData() async {
+        await FirebaseFirestore.instance
+            .collection('courses')
+            .doc(widget.courseID)
+            .collection('testsassignments')
+            .get()
+            .then((doc) {
+          doc.docs.forEach((data) {
+            _ttsMessages.add(data['code']);
+            _ttsMessages1.add(data['desc']);
+          });
+        });
+      }
+
+      _tts("Tests and Assignments Menu");
+      getData();
+
+      void speak_messages() async {
+        for (int i = 0; i <= _ttsMessages.length; i++) {
+          // t1 = Timer(Duration(seconds: 3), () {
+          //   _tts(_ttsMessages[i]);
+          // });
+          await Future.delayed(const Duration(milliseconds: 3000), () {
+            _tts(_ttsMessages[i]);
+          });
+          await Future.delayed(const Duration(milliseconds: 2000), () {
+            _tts(_ttsMessages1[i]);
+          });
+        }
+      }
+
+      speak_messages();
+      //
+
+    }
+
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     if (_text == "go back") {
+      tt_speech.stop();
       SchedulerBinding.instance.addPostFrameCallback((_) {
         Navigator.pop(context);
       });
@@ -95,11 +176,7 @@ class _TestsMenuState extends State<TestsMenu> {
               height: 15.0,
             ),
             StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('courses')
-                    .doc(widget.courseID)
-                    .collection('testsassignments')
-                    .snapshots(),
+                stream: _mystream,
                 builder: (BuildContext context,
                     AsyncSnapshot<QuerySnapshot> snapshot) {
                   if (snapshot.hasError) {
@@ -116,46 +193,68 @@ class _TestsMenuState extends State<TestsMenu> {
                         Map<String, dynamic> data =
                             document.data()! as Map<String, dynamic>;
 
-                        if (!widget.isAdmin!) {
-                          var _ttsMessages = snapshot.data!.docs
-                              .map((DocumentSnapshot document) {
-                            Map<String, dynamic> data =
-                                document.data()! as Map<String, dynamic>;
-                            return data['desc'].toString();
-                          }).toList();
+                        // if (!widget.isAdmin!) {
 
-                          void speak_messages() async {
-                            for (int i = 0; i <= _ttsMessages.length; i++) {
-                              await Future.delayed(
-                                  const Duration(milliseconds: 3000), () {
-                                _tts(_ttsMessages[i]);
-                              });
-                            }
-                            //
-                            // await Future.delayed(const Duration(milliseconds: 2000), () {
-                            //   _listen();
-                            // });
-                          }
+                        if (_text == data['code'].toString()) {
+                          print("matched");
+                          tt_speech.stop();
+                          validate(document.id);
 
-                          speak_messages();
-                          //
-                          // print(_text);
-                          // if (_text.replaceAll(RegExp(r"\s+"), "") ==
-                          //     data['name']) {
-                          //   SchedulerBinding.instance.addPostFrameCallback((_) {
-                          //     Navigator.push(
-                          //         context,
-                          //         MaterialPageRoute(
-                          //             builder: (ctx) => StudentCoursesHomePage(
-                          //                 widget.studentID!,
-                          //                 data['courseID'],
-                          //                 data['name'])));
-                          //   });
-                          // }
+                          // Navigator.push(
+                          //     context,
+                          //     MaterialPageRoute(
+                          //         builder: (ctx) => StudentCoursesHomePage(
+                          //             widget.studentID!,
+                          //             data['courseID'],
+                          //             data['name'])));
 
                         }
-
-                        print(data['studentID']);
+                        //   var _ttsMessages = snapshot.data!.docs
+                        //       .map((DocumentSnapshot document) {
+                        //     Map<String, dynamic> data =
+                        //         document.data()! as Map<String, dynamic>;
+                        //     return data['code'].toString();
+                        //   }).toList();
+                        //   var _ttsMessages1 = snapshot.data!.docs
+                        //       .map((DocumentSnapshot document) {
+                        //     Map<String, dynamic> data =
+                        //         document.data()! as Map<String, dynamic>;
+                        //     return data['desc'].toString();
+                        //   }).toList();
+                        //
+                        //   void speak_messages() async {
+                        //     for (int i = 0; i <= _ttsMessages.length; i++) {
+                        //       // t1 = Timer(Duration(seconds: 3), () {
+                        //       //   _tts(_ttsMessages[i]);
+                        //       // });
+                        //       await Future.delayed(
+                        //           const Duration(milliseconds: 3000), () {
+                        //         _tts(_ttsMessages[i]);
+                        //       });
+                        //       await Future.delayed(
+                        //           const Duration(milliseconds: 2000), () {
+                        //         _tts(_ttsMessages1[i]);
+                        //       });
+                        //     }
+                        //   }
+                        //
+                        //   speak_messages();
+                        //   //
+                        //   if (_text == data['code'].toString()) {
+                        //     print("matched");
+                        //     tt_speech.stop();
+                        //     validate(document.id);
+                        //
+                        //     // Navigator.push(
+                        //     //     context,
+                        //     //     MaterialPageRoute(
+                        //     //         builder: (ctx) => StudentCoursesHomePage(
+                        //     //             widget.studentID!,
+                        //     //             data['courseID'],
+                        //     //             data['name'])));
+                        //
+                        //   }
+                        // }
 
                         return Column(
                           children: [
@@ -180,37 +279,38 @@ class _TestsMenuState extends State<TestsMenu> {
                                                   },
                                                 )),
                                       )
-                                    : await FirebaseFirestore.instance
-                                        .collection('courses')
-                                        .doc(widget.courseID)
-                                        .collection('testsassignments')
-                                        .doc(document.id)
-                                        .collection("answers")
-                                        // .where("assignmentID",
-                                        //     isEqualTo: document.id)
-                                        .where("studentID",
-                                            isEqualTo: widget.studentID)
-                                        .get()
-                                        .then((doc) {
-                                        if (doc.docs.isNotEmpty) {
-                                          print(data['studentID']);
-                                          _tts("Answer already submitted");
-                                        } else {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) => AddAnswer(
-                                                      data: {
-                                                        "docID": document.id,
-                                                        "studentID":
-                                                            widget.studentID,
-                                                        "courseID":
-                                                            widget.courseID!,
-                                                      },
-                                                    )),
-                                          );
-                                        }
-                                      });
+                                    : validate(document.id);
+                                // : await FirebaseFirestore.instance
+                                //     .collection('courses')
+                                //     .doc(widget.courseID)
+                                //     .collection('testsassignments')
+                                //     .doc(document.id)
+                                //     .collection("answers")
+                                //     // .where("assignmentID",
+                                //     //     isEqualTo: document.id)
+                                //     .where("studentID",
+                                //         isEqualTo: widget.studentID)
+                                //     .get()
+                                //     .then((doc) {
+                                //     if (doc.docs.isNotEmpty) {
+                                //       print(data['studentID']);
+                                //       _tts("Answer already submitted");
+                                //     } else {
+                                //       Navigator.push(
+                                //         context,
+                                //         MaterialPageRoute(
+                                //             builder: (context) => AddAnswer(
+                                //                   data: {
+                                //                     "docID": document.id,
+                                //                     "studentID":
+                                //                         widget.studentID,
+                                //                     "courseID":
+                                //                         widget.courseID!,
+                                //                   },
+                                //                 )),
+                                //       );
+                                //     }
+                                //   });
                               },
                               onLongPress: () {
                                 widget.isAdmin!
@@ -240,6 +340,11 @@ class _TestsMenuState extends State<TestsMenu> {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceEvenly,
                                     children: [
+                                      Text(
+                                        "Code: ${data['code']}",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold),
+                                      ),
                                       SizedBox(
                                         height: 5,
                                       ),
@@ -252,14 +357,6 @@ class _TestsMenuState extends State<TestsMenu> {
                                       SizedBox(
                                         height: 5,
                                       ),
-                                      // Text(
-                                      //   "Date:",
-                                      //   style: TextStyle(fontWeight: FontWeight.bold),
-                                      // ),
-                                      // Text(data['date']
-                                      //     .toDate()
-                                      //     .toString()
-                                      //     .substring(0, 16))
                                     ],
                                   ),
                                 ),

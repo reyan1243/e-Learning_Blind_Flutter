@@ -63,12 +63,45 @@ class _CoursesMenuState extends State<CoursesMenu> {
   }
 
   String _text = 'Speech Text';
+  late Stream<QuerySnapshot> stream2;
+  var _ttsMessages = [];
 
   @override
   void initState() {
+    stream2 = FirebaseFirestore.instance.collection('courses').snapshots();
     tt_speech = tts.TextToSpeech();
     _speech = stt.SpeechToText();
-    _tts("Course HomePage");
+
+    if (!widget.isAdmin) {
+      void getData() async {
+        await FirebaseFirestore.instance
+            .collection('courses')
+            .get()
+            .then((doc) {
+          doc.docs.forEach((data) {
+            _ttsMessages.add(data['name']);
+          });
+        });
+      }
+
+      getData();
+      _tts("Courses Menu");
+
+      void speak_messages() async {
+        for (int i = 0; i <= _ttsMessages.length; i++) {
+          // t1 = Timer(Duration(seconds: 3), () {
+          //   _tts(_ttsMessages[i]);
+          // });
+          await Future.delayed(const Duration(milliseconds: 3000), () {
+            _tts(_ttsMessages[i]);
+          });
+        }
+      }
+
+      speak_messages();
+      //
+
+    }
 
     super.initState();
   }
@@ -110,9 +143,7 @@ class _CoursesMenuState extends State<CoursesMenu> {
               height: 15.0,
             ),
             StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('courses')
-                    .snapshots(),
+                stream: stream2,
                 builder: (BuildContext context,
                     AsyncSnapshot<QuerySnapshot> snapshot) {
                   if (snapshot.hasError) {
@@ -140,6 +171,7 @@ class _CoursesMenuState extends State<CoursesMenu> {
                           print(_text);
                           if (_text.replaceAll(RegExp(r"\s+"), "") ==
                               data['name']) {
+                            tt_speech.stop();
                             SchedulerBinding.instance.addPostFrameCallback((_) {
                               Navigator.push(
                                   context,

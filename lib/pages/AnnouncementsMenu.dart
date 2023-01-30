@@ -52,14 +52,66 @@ class _AnnouncementsMenuState extends State<AnnouncementsMenu> {
   }
 
   late bool isAdmin;
+  late Stream<QuerySnapshot> _mystream;
 
   String _text = 'Speech Text';
+  var _ttsMessages = [];
 
   @override
   void initState() {
+    _mystream = FirebaseFirestore.instance
+        .collection('announcements')
+        .orderBy("createdAt", descending: true)
+        // .where("createdAt",
+        //     isLessThan: DateTime.now()
+        //         .subtract(Duration(days: 2))
+        //         .toIso8601String())
+        .snapshots();
+
     tt_speech = tts.TextToSpeech();
     isAdmin = widget.isAdmin!;
     _speech = stt.SpeechToText();
+    tt_speech.stop();
+
+    void getData() async {
+      await FirebaseFirestore.instance
+          .collection('announcements')
+          .orderBy("createdAt", descending: true)
+          .get()
+          .then((doc) {
+        doc.docs.forEach((data) {
+          // Map<String, dynamic> data =
+          // element.data();
+          _ttsMessages.add(data['desc']);
+          // var _ttsMessages = snapshot.data!.docs
+          //     .map((DocumentSnapshot document) {
+          //   Map<String, dynamic> data =
+          //   document.data()! as Map<String, dynamic>;
+          //   return data['code'].toString();
+          // }).toList();
+        });
+      });
+    }
+
+    if (!widget.isAdmin!) {
+      _tts("Announcements Screen");
+      getData();
+
+      void speak_messages() async {
+        for (int i = 0; i <= _ttsMessages.length; i++) {
+          // t1 = Timer(Duration(seconds: 3), () {
+          //   _tts(_ttsMessages[i]);
+          // });
+          await Future.delayed(const Duration(milliseconds: 3000), () {
+            _tts(_ttsMessages[i]);
+          });
+        }
+      }
+
+      speak_messages();
+      //
+
+    }
     //
     // void speak_messages() async {
     //   for (int i = 0; i <= 5; i++) {
@@ -91,10 +143,8 @@ class _AnnouncementsMenuState extends State<AnnouncementsMenu> {
   @override
   Widget build(BuildContext context) {
     if (_text == "go back") {
-      setState(() {
-        tt_speech.stop();
-        _isListening = false;
-      });
+      tt_speech.stop();
+      _isListening = false;
 
       Navigator.of(context).pop();
     }
@@ -112,14 +162,7 @@ class _AnnouncementsMenuState extends State<AnnouncementsMenu> {
             ),
             //todo: order by date (less than 2 days)
             StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('announcements')
-                    .orderBy("createdAt", descending: true)
-                    // .where("createdAt",
-                    //     isLessThan: DateTime.now()
-                    //         .subtract(Duration(days: 2))
-                    //         .toIso8601String())
-                    .snapshots(),
+                stream: _mystream,
                 builder: (BuildContext context,
                     AsyncSnapshot<QuerySnapshot> snapshot) {
                   if (snapshot.hasError) {
@@ -129,29 +172,29 @@ class _AnnouncementsMenuState extends State<AnnouncementsMenu> {
                     return Text("Loading");
                   }
 
-                  if (!isAdmin) {
-                    var _ttsMessages =
-                        snapshot.data!.docs.map((DocumentSnapshot document) {
-                      Map<String, dynamic> data =
-                          document.data()! as Map<String, dynamic>;
-                      return data['desc'].toString();
-                    }).toList();
-
-                    void speak_messages() async {
-                      for (int i = 0; i <= _ttsMessages.length; i++) {
-                        await Future.delayed(const Duration(milliseconds: 3000),
-                            () {
-                          _tts(_ttsMessages[i]);
-                        });
-                      }
-                      //
-                      // await Future.delayed(const Duration(milliseconds: 2000), () {
-                      //   _listen();
-                      // });
-                    }
-
-                    speak_messages();
-                  }
+                  // if (!isAdmin) {
+                  //   var _ttsMessages =
+                  //       snapshot.data!.docs.map((DocumentSnapshot document) {
+                  //     Map<String, dynamic> data =
+                  //         document.data()! as Map<String, dynamic>;
+                  //     return data['desc'].toString();
+                  //   }).toList();
+                  //
+                  //   void speak_messages() async {
+                  //     for (int i = 0; i <= _ttsMessages.length; i++) {
+                  //       await Future.delayed(const Duration(milliseconds: 3000),
+                  //           () {
+                  //         _tts(_ttsMessages[i]);
+                  //       });
+                  //     }
+                  //     //
+                  //     // await Future.delayed(const Duration(milliseconds: 2000), () {
+                  //     //   _listen();
+                  //     // });
+                  //   }
+                  //
+                  //   speak_messages();
+                  // }
 
                   return Expanded(
                     child: ListView(

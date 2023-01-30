@@ -28,6 +28,7 @@ class _AddTestAssignmentState extends State<AddTestAssignment> {
   void dispose() {
     nameNode.dispose();
     nameController.clear();
+    idController.clear();
     questionController.clear();
     // nameController.clear();
     descController.clear();
@@ -40,8 +41,10 @@ class _AddTestAssignmentState extends State<AddTestAssignment> {
   TextEditingController nameController = TextEditingController();
   TextEditingController questionController = TextEditingController();
   TextEditingController descController = TextEditingController();
+  TextEditingController idController = TextEditingController();
 
   FocusNode nameNode = FocusNode();
+  FocusNode idNode = FocusNode();
   FocusNode questionNode = FocusNode();
   FocusNode descNode = FocusNode();
 
@@ -64,6 +67,23 @@ class _AddTestAssignmentState extends State<AddTestAssignment> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    InputField(
+                      textValueController: idController,
+                      node: idNode,
+                      label: 'ID',
+                      hint: 'Add ID',
+                      suffixIcon: const SizedBox(
+                        height: 0.0,
+                        width: 0.0,
+                      ),
+                      onValidate: (val) {
+                        if (val.isEmpty) {
+                          return 'Please provide a value';
+                        } else {
+                          return null;
+                        }
+                      },
+                    ),
                     InputField(
                       textValueController: questionController,
                       node: questionNode,
@@ -166,6 +186,7 @@ class _AddTestAssignmentState extends State<AddTestAssignment> {
                           onPressed: () async {
                             if (questionController.text.isNotEmpty &&
                                 descController.text.isNotEmpty &&
+                                idController.text.isNotEmpty &&
                                 dropdownValue != null) {
                               _submit();
                               setState(() {});
@@ -221,6 +242,7 @@ class _AddTestAssignmentState extends State<AddTestAssignment> {
           .doc(doc.id)
           .set({
         "id": doc.id,
+        'code': idController.text,
         "question": questionController.text,
         "desc": descController.text,
         "isTest": dropdownValue == "Test" ? true : false,

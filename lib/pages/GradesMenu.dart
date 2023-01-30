@@ -36,6 +36,9 @@ class _GradesMenuState extends State<GradesMenu> {
   }
 
   String _text = 'Speech Text';
+  late Stream<QuerySnapshot> _mystream;
+  var _ttsMessages = [];
+  var _ttsMessages1 = [];
 
   void _listen() async {
     if (!_isListening) {
@@ -87,6 +90,50 @@ class _GradesMenuState extends State<GradesMenu> {
   void initState() {
     tt_speech = tts.TextToSpeech();
     _speech = stt.SpeechToText();
+    _mystream = FirebaseFirestore.instance
+        .collection('courses')
+        .doc(widget.courseID)
+        .collection('grades')
+        .where("studentID", isEqualTo: widget.studentid)
+        .snapshots();
+
+    if (!widget.isAdmin!) {
+      void getData() async {
+        await FirebaseFirestore.instance
+            .collection('courses')
+            .doc(widget.courseID)
+            .collection('grades')
+            .where("studentID", isEqualTo: widget.studentid)
+            .get()
+            .then((doc) {
+          doc.docs.forEach((data) {
+            _ttsMessages.add(data['assignmentID']);
+            _ttsMessages1.add(data['desc']);
+          });
+        });
+      }
+
+      _tts("Grades Menu");
+      getData();
+
+      void speak_messages() async {
+        for (int i = 0; i <= _ttsMessages.length; i++) {
+          // t1 = Timer(Duration(seconds: 3), () {
+          //   _tts(_ttsMessages[i]);
+          // });
+          await Future.delayed(const Duration(milliseconds: 3000), () {
+            _tts(_ttsMessages[i]);
+          });
+          await Future.delayed(const Duration(milliseconds: 2000), () {
+            _tts(_ttsMessages1[i]);
+          });
+        }
+      }
+
+      speak_messages();
+      //
+
+    }
     super.initState();
   }
 
@@ -118,12 +165,7 @@ class _GradesMenuState extends State<GradesMenu> {
               height: 15.0,
             ),
             StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('courses')
-                    .doc(widget.courseID)
-                    .collection('grades')
-                    .where("studentID", isEqualTo: widget.studentid)
-                    .snapshots(),
+                stream: _mystream,
                 builder: (BuildContext context,
                     AsyncSnapshot<QuerySnapshot> snapshot) {
                   print(widget.courseID);
@@ -135,29 +177,29 @@ class _GradesMenuState extends State<GradesMenu> {
                     return Text("Loading");
                   }
                   if (snapshot.hasData) {
-                    if (!widget.isAdmin) {
-                      var _ttsMessages =
-                          snapshot.data!.docs.map((DocumentSnapshot document) {
-                        Map<String, dynamic> data =
-                            document.data()! as Map<String, dynamic>;
-                        return data['desc'].toString();
-                      }).toList();
-
-                      void speak_messages() async {
-                        for (int i = 0; i <= _ttsMessages.length; i++) {
-                          await Future.delayed(
-                              const Duration(milliseconds: 3000), () {
-                            _tts(_ttsMessages[i]);
-                          });
-                        }
-                        //
-                        // await Future.delayed(const Duration(milliseconds: 2000), () {
-                        //   _listen();
-                        // });
-                      }
-
-                      speak_messages();
-                    }
+                    // if (!widget.isAdmin) {
+                    //   var _ttsMessages =
+                    //       snapshot.data!.docs.map((DocumentSnapshot document) {
+                    //     Map<String, dynamic> data =
+                    //         document.data()! as Map<String, dynamic>;
+                    //     return data['desc'].toString();
+                    //   }).toList();
+                    //
+                    //   void speak_messages() async {
+                    //     for (int i = 0; i <= _ttsMessages.length; i++) {
+                    //       await Future.delayed(
+                    //           const Duration(milliseconds: 3000), () {
+                    //         _tts(_ttsMessages[i]);
+                    //       });
+                    //     }
+                    //     //
+                    //     // await Future.delayed(const Duration(milliseconds: 2000), () {
+                    //     //   _listen();
+                    //     // });
+                    //   }
+                    //
+                    //   speak_messages();
+                    // }
 
                     return Expanded(
                       child: ListView(
