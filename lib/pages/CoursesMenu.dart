@@ -7,10 +7,13 @@ import 'package:elearningblind/pages/LecturesMenu.dart';
 import 'package:elearningblind/pages/StudentCoursesHomePage.dart';
 import 'package:elearningblind/pages/TestsMenu.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:text_to_speech/text_to_speech.dart' as tts;
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 import 'UploadPdf.dart';
 
-class CoursesMenu extends StatelessWidget {
+class CoursesMenu extends StatefulWidget {
   static const routeName = 'CoursesMenu';
 
   bool isAdmin;
@@ -18,17 +21,83 @@ class CoursesMenu extends StatelessWidget {
 
   CoursesMenu({required this.isAdmin, this.studentID});
 
-  // var items = [
-  //   "Lectutres 1",
-  //   "Lectutres 2",
-  //   "Lectutres 3",
-  //   "Lectutres 4",
-  //   "Lectutres 5",
-  //   "Lectutres 6",
-  // ];
+  @override
+  State<CoursesMenu> createState() => _CoursesMenuState();
+}
+
+class _CoursesMenuState extends State<CoursesMenu> {
+  var courses = [];
+
+  late tts.TextToSpeech tt_speech;
+  late stt.SpeechToText _speech;
+
+  bool _isListening = false;
+  double rate = 0.5;
+
+  _tts(String message) {
+    tt_speech.setRate(rate);
+    tt_speech.speak(message);
+  }
+
+  void _listen() async {
+    if (!_isListening) {
+      bool available = await _speech.initialize(
+        onStatus: (val) => print('onStatus: $val'),
+        onError: (val) => {print('onError: $val')},
+      );
+      if (available) {
+        setState(() => _isListening = true);
+        _speech.listen(
+          onResult: (val) => setState(() {
+            _text = val.recognizedWords;
+            // if (val.hasConfidenceRating && val.confidence > 0) {
+            //   _confidence = val.confidence;
+            // }
+          }),
+        );
+      }
+    } else {
+      setState(() => _isListening = false);
+      _speech.stop();
+    }
+  }
+
+  String _text = 'Speech Text';
+
+  @override
+  void initState() {
+    tt_speech = tts.TextToSpeech();
+    _speech = stt.SpeechToText();
+    _tts("Course HomePage");
+
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    tt_speech.stop();
+    _isListening = false;
+    // _text = "";
+    // _isListening = false;
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (_text == "go back") {
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        Navigator.pop(context);
+      });
+    }
+
+    // if (courses['name'].contains(_text)) {
+    //   Navigator.push(
+    //       context,
+    //       MaterialPageRoute(
+    //           builder: (ctx) => StudentCoursesHomePage(
+    //               widget.studentID!, data['courseID'], data['name'])));
+    // }
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Courses Menu"),
@@ -53,15 +122,39 @@ class CoursesMenu extends StatelessWidget {
                     return Text("Loading");
                   }
 
+                  courses =
+                      snapshot.data!.docs.map((DocumentSnapshot document) {
+                    Map<String, dynamic> data =
+                        document.data()! as Map<String, dynamic>;
+                    return data;
+                  }).toList();
+
                   return Expanded(
                     child: ListView(
                       children:
                           snapshot.data!.docs.map((DocumentSnapshot document) {
                         Map<String, dynamic> data =
                             document.data()! as Map<String, dynamic>;
+
+                        if (!widget.isAdmin) {
+                          print(_text);
+                          if (_text.replaceAll(RegExp(r"\s+"), "") ==
+                              data['name']) {
+                            SchedulerBinding.instance.addPostFrameCallback((_) {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (ctx) => StudentCoursesHomePage(
+                                          widget.studentID!,
+                                          data['courseID'],
+                                          data['name'])));
+                            });
+                          }
+                        }
+
                         return GestureDetector(
                           onTap: () {
-                            isAdmin
+                            widget.isAdmin
                                 ? Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -72,25 +165,9 @@ class CoursesMenu extends StatelessWidget {
                                     MaterialPageRoute(
                                         builder: (ctx) =>
                                             StudentCoursesHomePage(
-                                                studentID!,
+                                                widget.studentID!,
                                                 data['courseID'],
                                                 data['name'])));
-                            // isTestMenu
-                            //     ? Navigator.push(
-                            //         context,
-                            //         MaterialPageRoute(
-                            //             builder: (ctx) => TestsMenu(
-                            //                   isAdmin: isAdmin,
-                            //                   courseId: data['courseID'],
-                            //                 )))
-                            //     : Navigator.push(
-                            //         context,
-                            //         MaterialPageRoute(
-                            //             builder: (ctx) => LecturesMenu(
-                            //                   isAdmin: isAdmin,
-                            //                   courseId: data['courseID'],
-                            //                 )));
-                            // // LecturesMenu.routeName);
                           },
                           child: Container(
                             height: 100.0,
@@ -116,7 +193,43 @@ class CoursesMenu extends StatelessWidget {
             SizedBox(
               height: 15.0,
             ),
-            isAdmin
+            !widget.isAdmin
+                ? Container(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: <Widget>[
+                        const Text(
+                          'Please enter your choice',
+                          style: TextStyle(
+                            fontSize: 24.0,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        SizedBox(height: 16.0),
+                        InkWell(
+                          child: _isListening == true
+                              ? Icon(
+                                  Icons.mic,
+                                  size:
+                                      MediaQuery.of(context).size.height * 0.3,
+                                )
+                              : Icon(Icons.mic_off,
+                                  size:
+                                      MediaQuery.of(context).size.height * 0.3),
+                          onTap: () {
+                            tt_speech.stop();
+                            _text = "";
+                            _listen();
+                          },
+                        ),
+                      ],
+                    ),
+                  )
+                : SizedBox(
+                    height: 0,
+                    width: 0,
+                  ),
+            widget.isAdmin
                 ? Container(
                     width: 300,
                     child: Padding(

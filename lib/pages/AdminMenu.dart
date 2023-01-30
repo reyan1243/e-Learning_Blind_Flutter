@@ -14,15 +14,7 @@ class AdminMenu extends StatelessWidget {
 
   var items = [
     {0: "Announcements", 1: AnnouncementsMenu(true)},
-    // {
-    //   0: "Test & Assignments",
-    //   1: CoursesMenu(
-    //     isAdmin: true,
-    //   )
-    // },
-    // {0: "Grades", 1: AdminGradesMenu()},
     {0: "Messages", 1: StudentChat(true, "admin")},
-    // {0: "Meeting", 1: StudentChat()},
     {
       0: "Courses",
       1: CoursesMenu(
@@ -47,8 +39,11 @@ class AdminMenu extends StatelessWidget {
                         actions: <Widget>[
                           TextButton(
                               onPressed: () {
-                                Navigator.of(context)
-                                    .pushReplacementNamed(MyHomePage.routeName);
+                                Navigator.pushAndRemoveUntil(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (_) => MyHomePage()),
+                                    (route) => false);
                               },
                               child: const Text(
                                 'Yes',

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 
 import 'package:text_to_speech/text_to_speech.dart' as tts;
 import 'package:speech_to_text/speech_to_text.dart' as stt;
@@ -92,6 +93,7 @@ class _StudentChatState extends State<StudentChat> {
           _text = val.recognizedWords;
 
           textFieldController.text = _text;
+          messageText = textFieldController.text;
           _tts(_text);
           // if (val.hasConfidenceRating && val.confidence > 0) {
           //   _confidence = val.confidence;
@@ -103,11 +105,16 @@ class _StudentChatState extends State<StudentChat> {
       print(_text);
       print(textFieldController.text);
       FirebaseFirestore.instance.collection('messages').add({
-        'text': textFieldController.text,
-        'sender': widget.username
+        'text': messageText,
+        'sender': widget.username,
+        'timestamp': FieldValue.serverTimestamp(),
         // 'sender': loggedinUser.email,
-      });
+      }).then((value) => {_tts("Message Sent")});
       textFieldController.clear();
+    } else if (_text == "back") {
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        Navigator.pop(context);
+      });
     }
 
     return Scaffold(
@@ -118,8 +125,10 @@ class _StudentChatState extends State<StudentChat> {
         child: Column(
           children: [
             StreamBuilder<QuerySnapshot>(
-              stream:
-                  FirebaseFirestore.instance.collection('messages').snapshots(),
+              stream: FirebaseFirestore.instance
+                  .collection('messages')
+                  .orderBy('timestamp', descending: true)
+                  .snapshots(),
               builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (!snapshot.hasData) {
                   return const Center(
@@ -128,7 +137,7 @@ class _StudentChatState extends State<StudentChat> {
                     ),
                   );
                 }
-                final messages = snapshot.data?.docs.reversed;
+                final messages = snapshot.data?.docs;
                 List<MessageBubble> messageBubbles = [];
 
                 for (DocumentSnapshot message in messages!) {
@@ -175,12 +184,15 @@ class _StudentChatState extends State<StudentChat> {
                     ),
                   ),
                   TextButton(
-                    onPressed: () {
+                    onPressed: () async {
                       textFieldController.clear();
 
-                      FirebaseFirestore.instance.collection('messages').add({
+                      await FirebaseFirestore.instance
+                          .collection('messages')
+                          .add({
                         'text': messageText,
-                        'sender': widget.username
+                        'sender': widget.username,
+                        'timestamp': FieldValue.serverTimestamp(),
                         // 'sender': loggedinUser.email,
                       });
                     },

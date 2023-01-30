@@ -59,7 +59,7 @@ class _AnnouncementsMenuState extends State<AnnouncementsMenu> {
   void initState() {
     tt_speech = tts.TextToSpeech();
     isAdmin = widget.isAdmin!;
-    // _speech = stt.SpeechToText();
+    _speech = stt.SpeechToText();
     //
     // void speak_messages() async {
     //   for (int i = 0; i <= 5; i++) {
@@ -90,7 +90,7 @@ class _AnnouncementsMenuState extends State<AnnouncementsMenu> {
 
   @override
   Widget build(BuildContext context) {
-    if (_text == "back") {
+    if (_text == "go back") {
       setState(() {
         tt_speech.stop();
         _isListening = false;
@@ -115,6 +115,10 @@ class _AnnouncementsMenuState extends State<AnnouncementsMenu> {
                 stream: FirebaseFirestore.instance
                     .collection('announcements')
                     .orderBy("createdAt", descending: true)
+                    // .where("createdAt",
+                    //     isLessThan: DateTime.now()
+                    //         .subtract(Duration(days: 2))
+                    //         .toIso8601String())
                     .snapshots(),
                 builder: (BuildContext context,
                     AsyncSnapshot<QuerySnapshot> snapshot) {

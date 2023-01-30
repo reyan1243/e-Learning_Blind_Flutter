@@ -2,8 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:elearningblind/pages/EditLectureScreen.dart';
 import 'package:elearningblind/pages/UploadPdf.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:text_to_speech/text_to_speech.dart' as tts;
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 
-class LecturesMenu extends StatelessWidget {
+class LecturesMenu extends StatefulWidget {
   LecturesMenu({
     this.isAdmin,
     this.courseID,
@@ -14,17 +17,82 @@ class LecturesMenu extends StatelessWidget {
   bool? isAdmin;
   String? courseID;
 
-  // var items = [
-  //   "Lectutres 1",
-  //   "Lectutres 2",
-  //   "Lectutres 3",
-  //   "Lectutres 4",
-  //   "Lectutres 5",
-  //   "Lectutres 6",
-  // ];
+  @override
+  State<LecturesMenu> createState() => _LecturesMenuState();
+}
 
+class _LecturesMenuState extends State<LecturesMenu> {
+  late stt.SpeechToText _speech;
+  bool _isListening = false;
+
+  late tts.TextToSpeech tt_speech;
+  _tts(String message) {
+    tt_speech.setRate(rate);
+    tt_speech.speak(message);
+  }
+
+  double rate = 0.5;
+  void _listen() async {
+    if (!_isListening) {
+      bool available = await _speech.initialize(
+        onStatus: (val) => print('onStatus: $val'),
+        onError: (val) => {print('onError: $val')},
+      );
+      if (available) {
+        setState(() => _isListening = true);
+        _speech.listen(
+          onResult: (val) => setState(() {
+            _text = val.recognizedWords;
+            // if (val.hasConfidenceRating && val.confidence > 0) {
+            //   _confidence = val.confidence;
+            // }
+          }),
+        );
+      }
+    } else {
+      setState(() => _isListening = false);
+      _speech.stop();
+    }
+  }
+
+  String _text = 'Speech Text';
+  @override
+  void initState() {
+    tt_speech = tts.TextToSpeech();
+    _speech = stt.SpeechToText();
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      speak_messages();
+    });
+    super.initState();
+  }
+
+  late var _ttsMessages = [];
+
+  void speak_messages() async {
+    for (int i = 0; i <= _ttsMessages.length; i++) {
+      await Future.delayed(const Duration(milliseconds: 3000), () {
+        _tts(_ttsMessages[i]);
+      });
+    }
+    //
+    // await Future.delayed(const Duration(milliseconds: 2000), () {
+    //   _listen();
+    // });
+  }
+
+  // var items = [
   @override
   Widget build(BuildContext context) {
+    if (_text == "go back") {
+      setState(() {
+        tt_speech.stop();
+        _isListening = false;
+      });
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        Navigator.pop(context);
+      });
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Lecture's Menu"),
@@ -39,7 +107,7 @@ class LecturesMenu extends StatelessWidget {
             StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance
                     .collection('courses')
-                    .doc(courseID)
+                    .doc(widget.courseID)
                     .collection('lectures')
                     .snapshots(),
                 builder: (BuildContext context,
@@ -51,37 +119,75 @@ class LecturesMenu extends StatelessWidget {
                     return Text("Loading");
                   }
 
+                  if (!widget.isAdmin!) {
+                    _ttsMessages =
+                        snapshot.data!.docs.map((DocumentSnapshot document) {
+                      Map<String, dynamic> data =
+                          document.data()! as Map<String, dynamic>;
+                      return data['topic'].toString();
+                    }).toList();
+                  }
+
                   return Expanded(
-                    child: ListView(
-                      children:
-                          snapshot.data!.docs.map((DocumentSnapshot document) {
+                    child: ListView.builder(
+                      itemCount: snapshot.data!.docs.length,
+                      itemBuilder: (context, index) {
+                        var document = snapshot.data!.docs[index];
                         Map<String, dynamic> data =
                             document.data()! as Map<String, dynamic>;
+
                         return GestureDetector(
                           onLongPress: () {
-                            isAdmin!
+                            widget.isAdmin!
                                 ? Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                         builder: (ctx) => EditLectureScreen({
                                               "topic": data['topic'],
                                               "url": data['url'],
-                                              "courseID": courseID,
+                                              "courseID": widget.courseID,
                                               "docID": document.id
                                             }, "lectures")))
                                 : "";
                           },
-                          child: Expanded(
-                            // height: 100.0,
-                            child: Card(
-                              child: ListTile(
-                                title: Text(data['topic']),
-                                subtitle: Text(data['url']),
-                              ),
+                          child: Card(
+                            child: ListTile(
+                              title: Text(data['topic']),
+                              subtitle: Text(data['url']),
                             ),
                           ),
                         );
-                      }).toList(),
+                      },
+                      // children:
+                      //     snapshot.data!.docs.map((DocumentSnapshot document) {
+                      //   Map<String, dynamic> data =
+                      //       document.data()! as Map<String, dynamic>;
+                      //
+                      //   return GestureDetector(
+                      //     onLongPress: () {
+                      //       widget.isAdmin!
+                      //           ? Navigator.push(
+                      //               context,
+                      //               MaterialPageRoute(
+                      //                   builder: (ctx) => EditLectureScreen({
+                      //                         "topic": data['topic'],
+                      //                         "url": data['url'],
+                      //                         "courseID": widget.courseID,
+                      //                         "docID": document.id
+                      //                       }, "lectures")))
+                      //           : "";
+                      //     },
+                      //     child: Expanded(
+                      //       // height: 100.0,
+                      //       child: Card(
+                      //         child: ListTile(
+                      //           title: Text(data['topic']),
+                      //           subtitle: Text(data['url']),
+                      //         ),
+                      //       ),
+                      //     ),
+                      //   );
+                      // }).toList(),
 
                       // itemCount: items.length,
                       // itemBuilder: (context, index) {
@@ -95,7 +201,44 @@ class LecturesMenu extends StatelessWidget {
             SizedBox(
               height: 15.0,
             ),
-            isAdmin!
+            !widget.isAdmin!
+                ? Container(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: <Widget>[
+                        const Text(
+                          'Please enter your choice',
+                          style: TextStyle(
+                            fontSize: 24.0,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        SizedBox(height: 16.0),
+                        InkWell(
+                          child: _isListening == true
+                              ? Icon(
+                                  Icons.mic,
+                                  size:
+                                      MediaQuery.of(context).size.height * 0.3,
+                                )
+                              : Icon(Icons.mic_off,
+                                  size:
+                                      MediaQuery.of(context).size.height * 0.3),
+                          onTap: () {
+                            tt_speech.stop();
+                            _text = "";
+                            _listen();
+                            print(_text);
+                          },
+                        ),
+                      ],
+                    ),
+                  )
+                : SizedBox(
+                    height: 0,
+                    width: 0,
+                  ),
+            widget.isAdmin!
                 ? Container(
                     width: 300,
                     child: Padding(
@@ -114,7 +257,7 @@ class LecturesMenu extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => UploadPdf(courseID),
+                              builder: (context) => UploadPdf(widget.courseID),
                             ),
                           );
                         },

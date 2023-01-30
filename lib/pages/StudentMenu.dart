@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:elearningblind/pages/CoursesMenu.dart';
 import 'package:elearningblind/pages/GradesMenu.dart';
 import 'package:elearningblind/pages/HomePage.dart';
@@ -27,20 +29,12 @@ class _StudentMenuState extends State<StudentMenu> {
   var items = [
     //Announcement,courses(lectures-update-to-courses),Messages
     {0: "Announcements", 1: AnnouncementsMenu(false)},
-    // {
-    //   0: "Test & Assignments",
-    //   1: CoursesMenu(
-    //     isAdmin: false,
-    //     isTestMenu: true,
-    //   )
-    // },
-    // {0: "Grades", 1: GradesMenu()},
     {0: "Messages", 1: StudentChat(false, "")},
-    // {0: "Meeting", 1: StudentChat()},
     {
       0: "Courses",
       1: CoursesMenu(
         isAdmin: false,
+        studentID: "",
       )
     },
   ];
@@ -90,7 +84,7 @@ class _StudentMenuState extends State<StudentMenu> {
   }
 
   String _text = 'Speech Text';
-
+  late Timer _timer;
   @override
   void initState() {
     tt_speech = tts.TextToSpeech();
@@ -99,6 +93,7 @@ class _StudentMenuState extends State<StudentMenu> {
     studentID = widget.data['studentID'];
     name = widget.data['name'];
     username = widget.data['username'];
+    _ttsMessages[1] = "Welcome ${name}";
 
     // items[2][1] = GradesMenu(studentID!);
     items[1][1] = StudentChat(false, username);
@@ -106,7 +101,10 @@ class _StudentMenuState extends State<StudentMenu> {
 
     void speak_messages() async {
       for (int i = 0; i <= _ttsMessages.length; i++) {
-        await Future.delayed(const Duration(milliseconds: 3000), () {
+        // _timer = Timer(Duration(seconds: 3), () {
+        //   _tts(_ttsMessages[i]);
+        // });
+        await Future.delayed(const Duration(milliseconds: 2000), () {
           _tts(_ttsMessages[i]);
         });
       }
@@ -134,57 +132,37 @@ class _StudentMenuState extends State<StudentMenu> {
       setState(() {
         _isListening = false;
       });
+      tt_speech.stop();
       SchedulerBinding.instance.addPostFrameCallback((_) {
-        Navigator.pushReplacementNamed(context, MyHomePage.routeName);
+        Navigator.pushAndRemoveUntil(context,
+            MaterialPageRoute(builder: (_) => MyHomePage()), (route) => false);
+        // Navigator.popAndPushNamed(context, MyHomePage.routeName);
       });
     } else if (_text == 'announcements') {
       setState(() {
         _isListening = false;
       });
+      tt_speech.stop();
       SchedulerBinding.instance.addPostFrameCallback((_) {
         Navigator.pushNamed(context, AnnouncementsMenu.routeName);
       });
-    }
-    // else if (_text == 'tests') {
-    //   setState(() {
-    //     _isListening = false;
-    //   });
-    //   SchedulerBinding.instance.addPostFrameCallback((_) {
-    //     Navigator.pushNamed(context, TestsMenu.routeName);
-    //   });
-    // }
-    else if (_text == 'courses') {
+    } else if (_text == 'courses') {
       setState(() {
         _isListening = false;
       });
+      tt_speech.stop();
       SchedulerBinding.instance.addPostFrameCallback((_) {
         Navigator.pushNamed(context, CoursesMenu.routeName);
       });
-    }
-    //   else if (_text == 'test' || _text == 'assignments') {
-    //   setState(() {
-    //     _isListening = false;
-    //   });
-    //   SchedulerBinding.instance.addPostFrameCallback((_) {
-    //     Navigator.pushNamed(context, TestsMenu.routeName);
-    //   });
-    // }
-    else if (_text == 'messages') {
+    } else if (_text == 'messages') {
       setState(() {
         _isListening = false;
       });
+      tt_speech.stop();
       SchedulerBinding.instance.addPostFrameCallback((_) {
         Navigator.pushNamed(context, StudentChat.routeName);
       });
     }
-    //   else if (_text == 'grades') {
-    //   setState(() {
-    //     _isListening = false;
-    //   });
-    //   SchedulerBinding.instance.addPostFrameCallback((_) {
-    //     Navigator.pushNamed(context, Grad.routeName);
-    //   });
-    // }
 
     return Scaffold(
       appBar: AppBar(
@@ -193,29 +171,36 @@ class _StudentMenuState extends State<StudentMenu> {
         actions: [
           IconButton(
               icon: const Icon(Icons.logout, color: Colors.white),
-              onPressed: () => showDialog(
-                  context: context,
-                  builder: (ctx) => AlertDialog(
-                        content: const Text('Do you want to logout?'),
-                        actions: <Widget>[
-                          TextButton(
+              onPressed: () {
+                showDialog(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                          content: const Text('Do you want to logout?'),
+                          actions: <Widget>[
+                            TextButton(
+                                onPressed: () {
+                                  tt_speech.stop();
+                                  Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (_) => MyHomePage()),
+                                      (route) => false);
+                                },
+                                child: const Text(
+                                  'Yes',
+                                  style: TextStyle(color: Colors.black),
+                                )),
+                            TextButton(
                               onPressed: () {
-                                Navigator.of(context)
-                                    .pushReplacementNamed(MyHomePage.routeName);
+                                tt_speech.stop();
+                                Navigator.of(context).pop();
                               },
-                              child: const Text(
-                                'Yes',
-                                style: TextStyle(color: Colors.black),
-                              )),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text('No',
-                                style: TextStyle(color: Colors.black)),
-                          ),
-                        ],
-                      ))),
+                              child: const Text('No',
+                                  style: TextStyle(color: Colors.black)),
+                            ),
+                          ],
+                        ));
+              }),
         ],
       ),
       body: Container(
@@ -277,14 +262,18 @@ class _StudentMenuState extends State<StudentMenu> {
                       padding: EdgeInsets.all(5),
                       height: 100.0,
                       child: GestureDetector(
-                        onTap: () => {
+                        onTap: () {
+                          print("inside");
+                          tt_speech.setVolume(0);
+                          tt_speech.stop();
                           // TODO make this dynamic for each option
+
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => items[index][1] as Widget,
                             ),
-                          )
+                          );
                         },
                         child: Card(
                           child: Column(

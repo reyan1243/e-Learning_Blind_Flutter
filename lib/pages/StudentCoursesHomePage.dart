@@ -126,56 +126,59 @@ class _StudentCoursesHomePageState extends State<StudentCoursesHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    if (_text == "logout" || _text == "back") {
+    if (_text == "go back") {
       setState(() {
         _isListening = false;
       });
       SchedulerBinding.instance.addPostFrameCallback((_) {
-        Navigator.pushReplacementNamed(context, MyHomePage.routeName);
+        Navigator.pop(context);
       });
-    } else if (_text == 'announcements') {
+    } else if (_text == 'tests') {
       setState(() {
         _isListening = false;
       });
       SchedulerBinding.instance.addPostFrameCallback((_) {
-        Navigator.pushNamed(context, AnnouncementsMenu.routeName);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TestsMenu(
+              isAdmin: false,
+              courseID: widget.courseID,
+              studentID: widget.studentID,
+            ),
+          ),
+        );
       });
-    }
-    // else if (_text == 'tests') {
-    //   setState(() {
-    //     _isListening = false;
-    //   });
-    //   SchedulerBinding.instance.addPostFrameCallback((_) {
-    //     Navigator.pushNamed(context, TestsMenu.routeName);
-    //   });
-    // }
-    else if (_text == 'lectures') {
+    } else if (_text == 'lectures') {
       setState(() {
         _isListening = false;
       });
       SchedulerBinding.instance.addPostFrameCallback((_) {
-        Navigator.pushNamed(context, LecturesMenu.routeName);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                LecturesMenu(isAdmin: false, courseID: widget.courseID),
+          ),
+        );
       });
-    }
-    //   else if (_text == 'test' || _text == 'assignments') {
-    //   setState(() {
-    //     _isListening = false;
-    //   });
-    //   SchedulerBinding.instance.addPostFrameCallback((_) {
-    //     Navigator.pushNamed(context, TestsMenu.routeName);
-    //   });
-    // }
-    else if (_text == 'messages') {
+    } else if (_text == 'grades') {
       setState(() {
         _isListening = false;
       });
       SchedulerBinding.instance.addPostFrameCallback((_) {
-        Navigator.pushNamed(context, StudentChat.routeName);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                GradesMenu(false, widget.courseID!, widget.studentID!),
+          ),
+        );
       });
     }
     return Scaffold(
       appBar: AppBar(
-        title: Text('Student Menu'),
+        title: Text('Course Homepage'),
       ),
       body: Container(
         padding: EdgeInsets.only(top: 10),

@@ -9,8 +9,6 @@ import 'package:flutter/material.dart';
 
 import 'UploadPdf.dart';
 import 'package:text_to_speech/text_to_speech.dart' as tts;
-
-import 'package:text_to_speech/text_to_speech.dart' as tts;
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class GradesMenu extends StatefulWidget {
@@ -64,9 +62,22 @@ class _GradesMenuState extends State<GradesMenu> {
 
   // = "GRh0HYFhGk106N7qOzTH";
 
+  // @override
+  // void deactivate() {
+  //   setState(() {
+  //     _isListening = false;
+  //   });
+  //   tt_speech.stop();
+  //
+  //   super.deactivate();
+  // }
+
   @override
   void dispose() {
-    tt_speech.stop();
+    setState(() {
+      tt_speech.stop();
+      _isListening = false;
+    });
     // _text = "";
     // _isListening = false;
     super.dispose();
@@ -75,11 +86,26 @@ class _GradesMenuState extends State<GradesMenu> {
   @override
   void initState() {
     tt_speech = tts.TextToSpeech();
+    _speech = stt.SpeechToText();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_text == "go back") {
+      setState(() {
+        tt_speech.stop();
+        _isListening = false;
+      });
+      Navigator.pop(context);
+    } else if (_text == "repeat") {
+      setState(() {
+        tt_speech.stop();
+        _isListening = false;
+      });
+      // setState(() {});
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Grades Menu"),
@@ -221,7 +247,7 @@ class _GradesMenuState extends State<GradesMenu> {
                     ),
                   )
                 : SizedBox(
-                    height: 0.0,
+                    height: 0,
                     width: 0,
                   ),
             //     : SizedBox(

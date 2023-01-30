@@ -60,13 +60,6 @@ class _StudentLoginState extends State<StudentLogin> {
     }
   }
 
-  // void listenData() {
-  //   tt_speech.stop();
-  //   _text = "";
-  //   print("listenenig");
-  //   _listen();
-  // }
-
   @override
   void initState() {
     _speech = stt.SpeechToText();
@@ -93,14 +86,13 @@ class _StudentLoginState extends State<StudentLogin> {
   }
 
   void signinuser() async {
-    print(userController.text.toLowerCase().replaceAll(" ", ""));
+    print(userController.text);
     if (userController.text.isNotEmpty && passwordController.text.isNotEmpty) {
       var pass;
       try {
         await FirebaseFirestore.instance
             .collection("users")
-            .where("username",
-                isEqualTo: userController.text.toLowerCase().trim())
+            .where("username", isEqualTo: userController.text)
             .get()
             .then((doc) {
           if (doc.docs.isEmpty) {
@@ -109,16 +101,18 @@ class _StudentLoginState extends State<StudentLogin> {
             pass = doc.docs.first["pin"];
             if (pass == passwordController.text) {
               _tts("Logged In");
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => StudentMenu({
-                    "studentID": doc.docs.first["studentID"],
-                    "name": doc.docs.first["name"],
-                    "username": doc.docs.first["username"],
-                  }),
-                ),
-              );
+              SchedulerBinding.instance.addPostFrameCallback((_) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => StudentMenu({
+                      "studentID": doc.docs.first["studentID"],
+                      "name": doc.docs.first["name"],
+                      "username": doc.docs.first["username"],
+                    }),
+                  ),
+                );
+              });
             } else {
               _tts("Incorrect username or pin");
             }
@@ -180,7 +174,7 @@ class _StudentLoginState extends State<StudentLogin> {
         onResult: (val) => setState(() {
           _text = val.recognizedWords;
 
-          userController.text = _text;
+          userController.text = _text.toLowerCase();
           _tts(_text);
 
           setState(() {
@@ -240,10 +234,9 @@ class _StudentLoginState extends State<StudentLogin> {
         appBar: AppBar(
           title: const Text('Student Log In'),
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () => Navigator.of(context).pop(),
-            // .pushReplacementNamed(MyHomePage.routeName),
-          ),
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () => Navigator.pushReplacementNamed(
+                  context, MyHomePage.routeName)),
         ),
         body: SingleChildScrollView(
           child: Column(
@@ -347,7 +340,7 @@ class _StudentLoginState extends State<StudentLogin> {
                                             pass = doc.docs.first["pin"];
                                             if (pass ==
                                                 passwordController.text) {
-                                              Navigator.push(
+                                              Navigator.pushReplacement(
                                                 context,
                                                 MaterialPageRoute(
                                                   builder: (context) =>

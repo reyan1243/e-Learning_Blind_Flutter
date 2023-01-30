@@ -152,7 +152,7 @@ class _AddCourseState extends State<AddCourse> {
       print(doc.id);
 
       await FirebaseFirestore.instance.collection("courses").doc(doc.id).set({
-        "courseId": doc.id,
+        "courseID": doc.id,
         "name": nameController.text,
         "desc": descController.text
       }).then((value) => Fluttertoast.showToast(
