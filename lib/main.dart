@@ -16,20 +16,20 @@ import 'package:firebase_core/firebase_core.dart';
 // import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
-// import 'notificationservice/notification_service.dart';
-//
-// Future<void> backgroundHandler(RemoteMessage message) async {
-//   debugPrint(message.data.toString());
-//   debugPrint(message.notification!.title);
-// }
+import 'notificationservice/notification_service.dart';
+
+Future<void> backgroundHandler(RemoteMessage message) async {
+  debugPrint(message.data.toString());
+  debugPrint(message.notification!.title);
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
   // // handle background notification service
-  // FirebaseMessaging.onBackgroundMessage(backgroundHandler);
-  // NotificationService.initialize();
+  FirebaseMessaging.onBackgroundMessage(backgroundHandler);
+  NotificationService.initialize();
 
   runApp(MyApp());
 }
