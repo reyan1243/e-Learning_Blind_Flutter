@@ -60,72 +60,75 @@ class AdminMenu extends StatelessWidget {
                       ))),
         ],
       ),
-      body: Container(
-        padding: const EdgeInsets.only(top: 4),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                const SizedBox(
-                  width: 20.0,
-                ),
-                Column(
-                  children: const [
-                    Text(
-                      "Welcome,",
-                      style: TextStyle(fontSize: 20),
-                    ),
-                    Text(
-                      "Admin",
-                      style: TextStyle(fontSize: 20),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(
-              height: 15.0,
-            ),
-            Expanded(
-              child: Container(
-                decoration: const BoxDecoration(
-                    color: Colors.grey,
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(60),
-                        topRight: Radius.circular(60))),
-                padding: const EdgeInsets.only(left: 16, top: 40, right: 16),
-                // color: Colors.grey,
-                child: ListView.builder(
-                  itemCount: items.length,
-                  itemBuilder: (context, index) {
-                    return Container(
-                      padding: const EdgeInsets.all(5),
-                      height: 100.0,
-                      child: GestureDetector(
-                        onTap: () => {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => items[index][1] as Widget,
-                            ),
-                          )
-                        },
-                        child: Card(
-                          child: Column(
-                            children: [
-                              ListTile(
-                                title: Text(items[index][0].toString()),
+      body: WillPopScope(
+        onWillPop: () async => false,
+        child: Container(
+          padding: const EdgeInsets.only(top: 4),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  const SizedBox(
+                    width: 20.0,
+                  ),
+                  Column(
+                    children: const [
+                      Text(
+                        "Welcome,",
+                        style: TextStyle(fontSize: 20),
+                      ),
+                      Text(
+                        "Admin",
+                        style: TextStyle(fontSize: 20),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 15.0,
+              ),
+              Expanded(
+                child: Container(
+                  decoration: const BoxDecoration(
+                      color: Colors.grey,
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(60),
+                          topRight: Radius.circular(60))),
+                  padding: const EdgeInsets.only(left: 16, top: 40, right: 16),
+                  // color: Colors.grey,
+                  child: ListView.builder(
+                    itemCount: items.length,
+                    itemBuilder: (context, index) {
+                      return Container(
+                        padding: const EdgeInsets.all(5),
+                        height: 100.0,
+                        child: GestureDetector(
+                          onTap: () => {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => items[index][1] as Widget,
                               ),
-                            ],
+                            )
+                          },
+                          child: Card(
+                            child: Column(
+                              children: [
+                                ListTile(
+                                  title: Text(items[index][0].toString()),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    );
-                  },
+                      );
+                    },
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

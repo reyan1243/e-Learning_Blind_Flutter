@@ -67,7 +67,6 @@ class _StudentChatState extends State<StudentChat> {
   void initState() {
     tt_speech = tts.TextToSpeech();
     _speech = stt.SpeechToText();
-    _tts("Messages Screen");
 
     stream2 = FirebaseFirestore.instance
         .collection('messages')
@@ -75,6 +74,7 @@ class _StudentChatState extends State<StudentChat> {
         .snapshots();
 
     if (!widget.isAdmin) {
+      _tts("Messages Screen");
       void getData() async {
         await FirebaseFirestore.instance
             .collection('messages')

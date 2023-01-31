@@ -144,7 +144,7 @@ class _StudentLoginState extends State<StudentLogin> {
 
   @override
   Widget build(BuildContext context) {
-    if (_text == "back") {
+    if (_text == "go back") {
       setState(() {
         _isListening = false;
       });
@@ -182,34 +182,8 @@ class _StudentLoginState extends State<StudentLogin> {
               _isListening = false; // <-- Code run after delay
             });
           });
-
-          // setState(() {
-          //   _isListening = false;
-          // });
-          // if (val.hasConfidenceRating && val.confidence > 0) {
-          //   _confidence = val.confidence;
-          // }
         }),
       );
-
-      // } else if (_text == "send") {
-      //   _tts("Sending Message");
-      //   print(_text);
-      //   print(textFieldController.text);
-      //   FirebaseFirestore.instance.collection('messages').add({
-      //     'text': textFieldController.text,
-      //     'sender': widget.username
-      //     // 'sender': loggedinUser.email,
-      //   });
-      //   textFieldController.clear();
-      // }
-
-      // listenData();
-
-      // setState(() {
-      //   print("listen false");
-      //   _isListening = false;
-      // });
 
       print("setting username");
     } else if (_text == 'listen password') {

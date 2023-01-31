@@ -144,7 +144,8 @@ class _StudentMenuState extends State<StudentMenu> {
       });
       tt_speech.stop();
       SchedulerBinding.instance.addPostFrameCallback((_) {
-        Navigator.pushNamed(context, AnnouncementsMenu.routeName);
+        Navigator.push(context,
+            MaterialPageRoute(builder: (ctx) => AnnouncementsMenu(false)));
       });
     } else if (_text == 'courses') {
       setState(() {
@@ -152,7 +153,11 @@ class _StudentMenuState extends State<StudentMenu> {
       });
       tt_speech.stop();
       SchedulerBinding.instance.addPostFrameCallback((_) {
-        Navigator.pushNamed(context, CoursesMenu.routeName);
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (ctx) =>
+                    CoursesMenu(isAdmin: false, studentID: studentID)));
       });
     } else if (_text == 'messages') {
       setState(() {
@@ -160,7 +165,8 @@ class _StudentMenuState extends State<StudentMenu> {
       });
       tt_speech.stop();
       SchedulerBinding.instance.addPostFrameCallback((_) {
-        Navigator.pushNamed(context, StudentChat.routeName);
+        Navigator.push(context,
+            MaterialPageRoute(builder: (ctx) => StudentChat(false, username)));
       });
     }
 
@@ -203,130 +209,133 @@ class _StudentMenuState extends State<StudentMenu> {
               }),
         ],
       ),
-      body: Container(
-        padding: EdgeInsets.only(top: 10),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                // const SizedBox(
-                //   width: 6.0,
-                // ),
-                // Container(
-                //   // padding: EdgeInsets.all(4),
-                //   width: 50,
-                //   height: 50,
-                //   decoration: const BoxDecoration(
-                //     shape: BoxShape.circle,
-                //     image: DecorationImage(
-                //       fit: BoxFit.fill,
-                //       image: NetworkImage(
-                //         'https://media.licdn.com/dms/image/C4D03AQFLPbgktVGZBQ/profile-displayphoto-shrink_800_800/0/1656325697250?e=1678320000&v=beta&t=Cyn-c8j-csmO-Nuc6vhOWX1uoKPRYHv5Qe7GXwLeKXo',
-                //       ),
-                //     ),
-                //   ),
-                // ),
-                const SizedBox(
-                  width: 20.0,
-                ),
-                Column(
-                  children: [
-                    Text(
-                      "Welcome,",
-                      style: TextStyle(fontSize: 20),
-                    ),
-                    Text(
-                      name!,
-                      style: TextStyle(fontSize: 20),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            SizedBox(
-              height: 15.0,
-            ),
-            Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                    color: Colors.grey,
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(60),
-                        topRight: Radius.circular(60))),
-                padding: EdgeInsets.all(16),
-                // color: Colors.grey,
-                child: ListView.builder(
-                  itemCount: items.length,
-                  itemBuilder: (context, index) {
-                    return Container(
-                      padding: EdgeInsets.all(5),
-                      height: 100.0,
-                      child: GestureDetector(
-                        onTap: () {
-                          print("inside");
-                          tt_speech.setVolume(0);
-                          tt_speech.stop();
-                          // TODO make this dynamic for each option
-
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => items[index][1] as Widget,
-                            ),
-                          );
-                        },
-                        child: Card(
-                          child: Column(
-                            children: [
-                              ListTile(
-                                title: Text(items[index][0].toString()),
-                              ),
-                              // InkWell(
-                              //   child: Icon(Icons.mic),
-                              //   onTap: () {
-                              //     // code for mic icon press action
-                              //   },
-                              // ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: <Widget>[
-                  const Text(
-                    'Please enter your choice',
-                    style: TextStyle(
-                      fontSize: 24.0,
-                      fontWeight: FontWeight.w700,
-                    ),
+      body: WillPopScope(
+        onWillPop: () async => false,
+        child: Container(
+          padding: EdgeInsets.only(top: 10),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  // const SizedBox(
+                  //   width: 6.0,
+                  // ),
+                  // Container(
+                  //   // padding: EdgeInsets.all(4),
+                  //   width: 50,
+                  //   height: 50,
+                  //   decoration: const BoxDecoration(
+                  //     shape: BoxShape.circle,
+                  //     image: DecorationImage(
+                  //       fit: BoxFit.fill,
+                  //       image: NetworkImage(
+                  //         'https://media.licdn.com/dms/image/C4D03AQFLPbgktVGZBQ/profile-displayphoto-shrink_800_800/0/1656325697250?e=1678320000&v=beta&t=Cyn-c8j-csmO-Nuc6vhOWX1uoKPRYHv5Qe7GXwLeKXo',
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
+                  const SizedBox(
+                    width: 20.0,
                   ),
-                  SizedBox(height: 16.0),
-                  InkWell(
-                    child: _isListening == true
-                        ? Icon(
-                            Icons.mic,
-                            size: MediaQuery.of(context).size.height * 0.3,
-                          )
-                        : Icon(Icons.mic_off,
-                            size: MediaQuery.of(context).size.height * 0.3),
-                    onTap: () {
-                      tt_speech.stop();
-                      _text = "";
-                      _listen();
-                      print(_text);
-                    },
+                  Column(
+                    children: [
+                      Text(
+                        "Welcome,",
+                        style: TextStyle(fontSize: 20),
+                      ),
+                      Text(
+                        name!,
+                        style: TextStyle(fontSize: 20),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ),
-          ],
+              SizedBox(
+                height: 15.0,
+              ),
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                      color: Colors.grey,
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(60),
+                          topRight: Radius.circular(60))),
+                  padding: EdgeInsets.all(16),
+                  // color: Colors.grey,
+                  child: ListView.builder(
+                    itemCount: items.length,
+                    itemBuilder: (context, index) {
+                      return Container(
+                        padding: EdgeInsets.all(5),
+                        height: 100.0,
+                        child: GestureDetector(
+                          onTap: () {
+                            print("inside");
+                            tt_speech.setVolume(0);
+                            tt_speech.stop();
+                            // TODO make this dynamic for each option
+
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => items[index][1] as Widget,
+                              ),
+                            );
+                          },
+                          child: Card(
+                            child: Column(
+                              children: [
+                                ListTile(
+                                  title: Text(items[index][0].toString()),
+                                ),
+                                // InkWell(
+                                //   child: Icon(Icons.mic),
+                                //   onTap: () {
+                                //     // code for mic icon press action
+                                //   },
+                                // ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: <Widget>[
+                    const Text(
+                      'Please enter your choice',
+                      style: TextStyle(
+                        fontSize: 24.0,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    SizedBox(height: 16.0),
+                    InkWell(
+                      child: _isListening == true
+                          ? Icon(
+                              Icons.mic,
+                              size: MediaQuery.of(context).size.height * 0.3,
+                            )
+                          : Icon(Icons.mic_off,
+                              size: MediaQuery.of(context).size.height * 0.3),
+                      onTap: () {
+                        tt_speech.stop();
+                        _text = "";
+                        _listen();
+                        print(_text);
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

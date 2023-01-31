@@ -123,14 +123,6 @@ class _CoursesMenuState extends State<CoursesMenu> {
       });
     }
 
-    // if (courses['name'].contains(_text)) {
-    //   Navigator.push(
-    //       context,
-    //       MaterialPageRoute(
-    //           builder: (ctx) => StudentCoursesHomePage(
-    //               widget.studentID!, data['courseID'], data['name'])));
-    // }
-
     return Scaffold(
       appBar: AppBar(
         title: Text("Courses Menu"),

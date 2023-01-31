@@ -183,6 +183,7 @@ class _StudentCoursesHomePageState extends State<StudentCoursesHomePage> {
         title: const Text('Course Homepage'),
       ),
       body: Container(
+        height: MediaQuery.of(context).size.height,
         padding: EdgeInsets.only(top: 10),
         child: Column(
           children: [
