@@ -29,6 +29,9 @@ dependencies:
   fluttertoast: ^8.0.8
   firebase_storage: ^11.0.0
   flutter_document_picker: ^5.1.0
+  firebase_messaging: 
+  flutter_local_notifications: 
+  http:
 #  flutter_plugin_pdf_viewer: ^1.0.7
 
 dev_dependencies:
