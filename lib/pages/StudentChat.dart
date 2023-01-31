@@ -156,7 +156,7 @@ class _StudentChatState extends State<StudentChat> {
         // 'sender': loggedinUser.email,
       }).then((value) => {_tts("Message Sent")});
       textFieldController.clear();
-    } else if (_text == "back") {
+    } else if (_text == "go back") {
       SchedulerBinding.instance.addPostFrameCallback((_) {
         Navigator.pop(context);
       });

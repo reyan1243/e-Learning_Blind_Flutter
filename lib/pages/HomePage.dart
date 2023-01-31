@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:elearningblind/notificationservice/notification_service.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+// import 'package:elearningblind/notificationservice/notification_service.dart';
+// import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
@@ -39,8 +39,8 @@ class _MyHomePageState extends State<MyHomePage> {
   void _listen() async {
     if (!_isListening) {
       bool available = await _speech.initialize(
-        onStatus: (val) => debugPrint('onStatus: $val'),
-        onError: (val) => {debugPrint('onError: $val')},
+        // onStatus: (val) => debugPrint('onStatus: $val'),
+        // onError: (val) => {debugPrint('onError: $val')},
       );
       if (available) {
         setState(() => _isListening = true);
@@ -83,59 +83,59 @@ class _MyHomePageState extends State<MyHomePage> {
     speak_messages();
 
     super.initState();
-
-    // notifications
-    // when app is closed
-    FirebaseMessaging.instance.getInitialMessage().then(
-      (message) {
-        debugPrint("FirebaseMessaging.instance.getInitialMessage");
-        if (message != null) {
-          debugPrint("New Notification");
-        }
-      },
-    );
-
-    // when app is opened
-    FirebaseMessaging.onMessage.listen(
-      (message) {
-        debugPrint("FirebaseMessaging.onMessage.listen");
-        if (message.notification != null) {
-          debugPrint(message.notification!.title);
-          debugPrint(message.notification!.body);
-          debugPrint("message.data11 ${message.data}");
-          NotificationService.createAndDisplayNotification(message);
-        }
-      },
-    );
-
-    // when app is in background (not closed)
-    FirebaseMessaging.onMessageOpenedApp.listen(
-      (message) {
-        debugPrint("FirebaseMessaging.onMessageOpenedApp.listen");
-        if (message.notification != null) {
-          debugPrint(message.notification!.title);
-          debugPrint(message.notification!.body);
-          debugPrint("message.data22 ${message.data['_id']}");
-        }
-      },
-    );
-  }
-
-  Future<void> getDeviceTokenToSendNotification() async {
-    // get device token and add to db
-    final FirebaseMessaging _fcm = FirebaseMessaging.instance;
-    final token = await _fcm.getToken().toString();
-
-    // add to collection if doesnt exist already
-    DocumentReference ref =
-        await FirebaseFirestore.instance.collection('device_tokens').doc(token);
-
-    DocumentSnapshot snapshot = await ref.get();
-    if (!snapshot.exists) {
-      await ref.set({
-        'token': token,
-      });
-    }
+  //
+  //   // notifications
+  //   // when app is closed
+  //   FirebaseMessaging.instance.getInitialMessage().then(
+  //     (message) {
+  //       debugPrint("FirebaseMessaging.instance.getInitialMessage");
+  //       if (message != null) {
+  //         debugPrint("New Notification");
+  //       }
+  //     },
+  //   );
+  //
+  //   // when app is opened
+  //   FirebaseMessaging.onMessage.listen(
+  //     (message) {
+  //       debugPrint("FirebaseMessaging.onMessage.listen");
+  //       if (message.notification != null) {
+  //         debugPrint(message.notification!.title);
+  //         debugPrint(message.notification!.body);
+  //         debugPrint("message.data11 ${message.data}");
+  //         NotificationService.createAndDisplayNotification(message);
+  //       }
+  //     },
+  //   );
+  //
+  //   // when app is in background (not closed)
+  //   FirebaseMessaging.onMessageOpenedApp.listen(
+  //     (message) {
+  //       debugPrint("FirebaseMessaging.onMessageOpenedApp.listen");
+  //       if (message.notification != null) {
+  //         debugPrint(message.notification!.title);
+  //         debugPrint(message.notification!.body);
+  //         debugPrint("message.data22 ${message.data['_id']}");
+  //       }
+  //     },
+  //   );
+  // }
+  //
+  // Future<void> getDeviceTokenToSendNotification() async {
+  //   // get device token and add to db
+  //   final FirebaseMessaging _fcm = FirebaseMessaging.instance;
+  //   final token = await _fcm.getToken().toString();
+  //
+  //   // add to collection if doesnt exist already
+  //   DocumentReference ref =
+  //       await FirebaseFirestore.instance.collection('device_tokens').doc(token);
+  //
+  //   DocumentSnapshot snapshot = await ref.get();
+  //   if (!snapshot.exists) {
+  //     await ref.set({
+  //       'token': token,
+  //     });
+  //   }
   }
 
   @override

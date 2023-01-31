@@ -128,7 +128,7 @@ class _StudentMenuState extends State<StudentMenu> {
 
   @override
   Widget build(BuildContext context) {
-    if (_text == "logout" || _text == "back") {
+    if (_text == "logout" || _text == "go back") {
       setState(() {
         _isListening = false;
       });

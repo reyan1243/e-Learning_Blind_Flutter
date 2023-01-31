@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "D:\\Anas\\StudioProjects\\e-Learning_Blind_Flutter\\build\\app\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-night-v8\\values-night-v8.xml",
+            "outputFile": "/home/oma/Desktop/frameworks/Flutter/elearning_modules/Android studio eblind(v2.3)/e-Learning_Blind_Flutter/build/app/intermediates/incremental/mergeDebugResources/merged.dir/values-night-v8/values-night-v8.xml",
             "map": [
                 {
-                    "source": "D:\\Anas\\StudioProjects\\e-Learning_Blind_Flutter\\android\\app\\src\\main\\res\\values-night\\styles.xml",
+                    "source": "/home/oma/Desktop/frameworks/Flutter/elearning_modules/Android studio eblind(v2.3)/e-Learning_Blind_Flutter/android/app/src/main/res/values-night/styles.xml",
                     "from": {
                         "startLines": "3,14",
                         "startColumns": "4,4",

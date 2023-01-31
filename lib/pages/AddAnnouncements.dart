@@ -1,5 +1,5 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+// import 'dart:convert';
+// import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -150,45 +150,45 @@ class _AddAnnouncementsState extends State<AddAnnouncements> {
               textColor: Colors.white));
 
       Navigator.pop(context);
-
-      // fire notification
-      QuerySnapshot snapshot =
-          await FirebaseFirestore.instance.collection('device_tokens').get();
-
-      List<String> tokens = [];
-
-      for (int i = 0; i < snapshot.docs.length; i++) {
-        tokens.add(snapshot.docs[i]['token']);
-      }
-
-      // now call api to show notification on all devices
-      const String SERVER_KEY =
-          "AAAAWCZlrro:APA91bEi0dwElLkIqsT2JIzUayebbwnDVbp1g_YhE2uVk-N9vu-7LnBG9KdQMiEzPgCmw000N1D75EJObTDNEpUTHQoQUJMHLrErGJyHg89uy71MyuHC3Qc0Ufvv_KZfSaRXJPMQapW-";
-
-      const String APIEndpoint = "https://fcm.googleapis.com/fcm/send";
-
-      final Map<String, dynamic> data = {
-        'registration_ids': tokens,
-        'notification': {
-          "body": "New Announcement has been shared",
-          "title": "Update",
-          "android_channel_id": "elearning-blind",
-          "sound": false
-        },
-      };
-
-      final String body = json.encode(data);
-
-      final Map<String, String> headers = {
-        'Content-Type': 'application/json',
-        'Authorization': 'key=$SERVER_KEY',
-      };
-
-      await http.post(
-        Uri.parse('https://fcm.googleapis.com/fcm/send'),
-        headers: headers,
-        body: body,
-      );
+      //
+      // // fire notification
+      // QuerySnapshot snapshot =
+      //     await FirebaseFirestore.instance.collection('device_tokens').get();
+      //
+      // List<String> tokens = [];
+      //
+      // for (int i = 0; i < snapshot.docs.length; i++) {
+      //   tokens.add(snapshot.docs[i]['token']);
+      // }
+      //
+      // // now call api to show notification on all devices
+      // const String SERVER_KEY =
+      //     "AAAAWCZlrro:APA91bEi0dwElLkIqsT2JIzUayebbwnDVbp1g_YhE2uVk-N9vu-7LnBG9KdQMiEzPgCmw000N1D75EJObTDNEpUTHQoQUJMHLrErGJyHg89uy71MyuHC3Qc0Ufvv_KZfSaRXJPMQapW-";
+      //
+      // const String APIEndpoint = "https://fcm.googleapis.com/fcm/send";
+      //
+      // final Map<String, dynamic> data = {
+      //   'registration_ids': tokens,
+      //   'notification': {
+      //     "body": "New Announcement has been shared",
+      //     "title": "Update",
+      //     "android_channel_id": "elearning-blind",
+      //     "sound": false
+      //   },
+      // };
+      //
+      // final String body = json.encode(data);
+      //
+      // final Map<String, String> headers = {
+      //   'Content-Type': 'application/json',
+      //   'Authorization': 'key=$SERVER_KEY',
+      // };
+      //
+      // await http.post(
+      //   Uri.parse('https://fcm.googleapis.com/fcm/send'),
+      //   headers: headers,
+      //   body: body,
+      // );
     } on PlatformException catch (er) {
       print(er.message);
     }

@@ -29,7 +29,7 @@ class _StudentLoginState extends State<StudentLogin> {
   bool _showPwd = true;
 
   late tts.TextToSpeech tt_speech;
-  double rate = 0.5;
+  double rate = 0.7;
   List<String> _ttsMessages = ['Login Page', "Select Your Choice"];
 
   _tts(String message) {
@@ -101,7 +101,7 @@ class _StudentLoginState extends State<StudentLogin> {
             pass = doc.docs.first["pin"];
             if (pass == passwordController.text) {
               _tts("Logged In");
-              SchedulerBinding.instance.addPostFrameCallback((_) {
+              // SchedulerBinding.instance.addPostFrameCallback((_) {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -112,7 +112,7 @@ class _StudentLoginState extends State<StudentLogin> {
                     }),
                   ),
                 );
-              });
+              // });
             } else {
               _tts("Incorrect username or pin");
             }
@@ -166,9 +166,8 @@ class _StudentLoginState extends State<StudentLogin> {
       tt_speech.stop();
       // if (_text == "listen message") {
       _tts("Speak");
-
       _text = "";
-
+      // userController.text = _text.toLowerCase();
       // setState(() => _isListening = true);
       _speech.listen(
         onResult: (val) => setState(() {
@@ -177,9 +176,15 @@ class _StudentLoginState extends State<StudentLogin> {
           userController.text = _text.toLowerCase();
           _tts(_text);
 
-          setState(() {
-            _isListening = false;
+          Future.delayed(Duration(seconds: 4), () { // <-- Delay here
+            setState(() {
+              _isListening = false; // <-- Code run after delay
+            });
           });
+
+          // setState(() {
+          //   _isListening = false;
+          // });
           // if (val.hasConfidenceRating && val.confidence > 0) {
           //   _confidence = val.confidence;
           // }
@@ -206,18 +211,26 @@ class _StudentLoginState extends State<StudentLogin> {
       // });
 
       print("setting username");
-    } else if (_text == 'listen password') {
+    }
+    else if (_text == 'listen password') {
       tt_speech.stop();
 
       _tts("Speak");
       _text = "";
-      passwordController.text = _text;
+
+      // passwordController.text = _text;
       _speech.listen(
         onResult: (val) => setState(() {
           _text = val.recognizedWords;
 
           passwordController.text = _text;
           _tts(_text);
+
+          Future.delayed(Duration(seconds: 4), () { // <-- Delay here
+            setState(() {
+              _isListening = false; // <-- Code run after delay
+            });
+          });
 
           // setState(() {
           //   _isListening = false;
