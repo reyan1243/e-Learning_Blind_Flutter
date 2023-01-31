@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="default_web_client_id" translatable="false">378601320122-iac0aliv5hk58k8r9c1bta05v9g08mlm.apps.googleusercontent.com</string>
+    <string name="gcm_defaultSenderId" translatable="false">378601320122</string>
+    <string name="google_api_key" translatable="false">AIzaSyB0RkiNnpFOqUiR3i1I1sYEvoIKpy7OFoo</string>
+    <string name="google_app_id" translatable="false">1:378601320122:android:732a0b7ad0524049301c83</string>
+    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyB0RkiNnpFOqUiR3i1I1sYEvoIKpy7OFoo</string>
+    <string name="google_storage_bucket" translatable="false">elearning-blind-23c88.appspot.com</string>
+    <string name="project_id" translatable="false">elearning-blind-23c88</string>
+</resources>

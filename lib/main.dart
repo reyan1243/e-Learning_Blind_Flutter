@@ -1,6 +1,4 @@
 // import 'package:elearningblind/pages/StudentLogIn.dart';
-import 'dart:html';
-
 import 'package:elearningblind/pages/AdminLectures.dart';
 import 'package:elearningblind/pages/AdminLogin.dart';
 import 'package:elearningblind/pages/AdminMenu.dart';

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "378601320122",
+    "project_id": "elearning-blind-23c88",
+    "storage_bucket": "elearning-blind-23c88.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:378601320122:android:732a0b7ad0524049301c83",
+        "android_client_info": {
+          "package_name": "com.example.elearningblind"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "378601320122-iac0aliv5hk58k8r9c1bta05v9g08mlm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB0RkiNnpFOqUiR3i1I1sYEvoIKpy7OFoo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "378601320122-iac0aliv5hk58k8r9c1bta05v9g08mlm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
