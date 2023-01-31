@@ -102,16 +102,16 @@ class _StudentLoginState extends State<StudentLogin> {
             if (pass == passwordController.text) {
               _tts("Logged In");
               // SchedulerBinding.instance.addPostFrameCallback((_) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => StudentMenu({
-                      "studentID": doc.docs.first["studentID"],
-                      "name": doc.docs.first["name"],
-                      "username": doc.docs.first["username"],
-                    }),
-                  ),
-                );
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => StudentMenu({
+                    "studentID": doc.docs.first["studentID"],
+                    "name": doc.docs.first["name"],
+                    "username": doc.docs.first["username"],
+                  }),
+                ),
+              );
               // });
             } else {
               _tts("Incorrect username or pin");
@@ -176,7 +176,8 @@ class _StudentLoginState extends State<StudentLogin> {
           userController.text = _text.toLowerCase();
           _tts(_text);
 
-          Future.delayed(Duration(seconds: 4), () { // <-- Delay here
+          Future.delayed(Duration(seconds: 4), () {
+            // <-- Delay here
             setState(() {
               _isListening = false; // <-- Code run after delay
             });
@@ -211,8 +212,7 @@ class _StudentLoginState extends State<StudentLogin> {
       // });
 
       print("setting username");
-    }
-    else if (_text == 'listen password') {
+    } else if (_text == 'listen password') {
       tt_speech.stop();
 
       _tts("Speak");
@@ -226,7 +226,8 @@ class _StudentLoginState extends State<StudentLogin> {
           passwordController.text = _text;
           _tts(_text);
 
-          Future.delayed(Duration(seconds: 4), () { // <-- Delay here
+          Future.delayed(Duration(seconds: 4), () {
+            // <-- Delay here
             setState(() {
               _isListening = false; // <-- Code run after delay
             });
