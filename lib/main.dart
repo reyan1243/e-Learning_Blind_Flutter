@@ -12,8 +12,9 @@ import 'package:elearningblind/pages/StudentLogIn.dart';
 import 'package:elearningblind/pages/StudentMenu.dart';
 import 'package:elearningblind/pages/StudentSignup.dart';
 import 'package:elearningblind/pages/TestsMenu.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-// import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 import 'notificationservice/notification_service.dart';
@@ -30,7 +31,6 @@ void main() async {
   // // handle background notification service
   FirebaseMessaging.onBackgroundMessage(backgroundHandler);
   NotificationService.initialize();
-
   runApp(MyApp());
 }
 

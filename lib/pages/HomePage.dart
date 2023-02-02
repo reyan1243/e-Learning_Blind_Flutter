@@ -39,9 +39,9 @@ class _MyHomePageState extends State<MyHomePage> {
   void _listen() async {
     if (!_isListening) {
       bool available = await _speech.initialize(
-        // onStatus: (val) => debugPrint('onStatus: $val'),
-        // onError: (val) => {debugPrint('onError: $val')},
-      );
+          // onStatus: (val) => debugPrint('onStatus: $val'),
+          // onError: (val) => {debugPrint('onError: $val')},
+          );
       if (available) {
         setState(() => _isListening = true);
         _speech.listen(
@@ -83,9 +83,9 @@ class _MyHomePageState extends State<MyHomePage> {
     speak_messages();
 
     super.initState();
-  //
-  //   // notifications
-  //   // when app is closed
+    //
+    //   // notifications
+    //   // when app is closed
     FirebaseMessaging.instance.getInitialMessage().then(
       (message) {
         debugPrint("FirebaseMessaging.instance.getInitialMessage");
@@ -94,8 +94,8 @@ class _MyHomePageState extends State<MyHomePage> {
         }
       },
     );
-  //
-  //   // when app is opened
+    //
+    //   // when app is opened
     FirebaseMessaging.onMessage.listen(
       (message) {
         debugPrint("FirebaseMessaging.onMessage.listen");
@@ -107,8 +107,8 @@ class _MyHomePageState extends State<MyHomePage> {
         }
       },
     );
-  //
-  //   // when app is in background (not closed)
+    //
+    //   // when app is in background (not closed)
     FirebaseMessaging.onMessageOpenedApp.listen(
       (message) {
         debugPrint("FirebaseMessaging.onMessageOpenedApp.listen");
@@ -120,16 +120,16 @@ class _MyHomePageState extends State<MyHomePage> {
       },
     );
   }
-  
+
   Future<void> getDeviceTokenToSendNotification() async {
     // get device token and add to db
     final FirebaseMessaging _fcm = FirebaseMessaging.instance;
     final token = await _fcm.getToken().toString();
-  
+
     // add to collection if doesnt exist already
     DocumentReference ref =
         await FirebaseFirestore.instance.collection('device_tokens').doc(token);
-  
+
     DocumentSnapshot snapshot = await ref.get();
     if (!snapshot.exists) {
       await ref.set({
@@ -165,16 +165,16 @@ class _MyHomePageState extends State<MyHomePage> {
             title: const Text('eLearning for blind'),
             automaticallyImplyLeading: false,
           ),
-          body: Column(
-            children: <Widget>[
-              Image.asset(
-                'assets/images/background_top.png',
-                height: 150,
-                width: MediaQuery.of(context).size.width,
-                fit: BoxFit.cover,
-              ),
-              SingleChildScrollView(
-                child: Column(
+          body: SingleChildScrollView(
+            child: Column(
+              children: <Widget>[
+                Image.asset(
+                  'assets/images/background_top.png',
+                  height: 150,
+                  width: MediaQuery.of(context).size.width,
+                  fit: BoxFit.cover,
+                ),
+                Column(
                   mainAxisAlignment:
                       MainAxisAlignment.center, // this line centers the title
 
@@ -295,41 +295,41 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              Container(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: <Widget>[
-                    Text(
-                      'Please enter your choice',
-                      style: TextStyle(
-                        fontSize: 24.0,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    SizedBox(height: 16.0),
-                    InkWell(
-                      child: _isListening == true
-                          ? Icon(
-                              Icons.mic,
-                              size: MediaQuery.of(context).size.height * 0.3,
-                            )
-                          : Icon(Icons.mic_off,
-                              size: MediaQuery.of(context).size.height * 0.3),
-                      onTap: () {
-                        tt_speech.stop();
-
-                        _text = "";
-                        _listen();
-                      },
-                    ),
-                  ],
+                const SizedBox(
+                  height: 10,
                 ),
-              ),
-            ],
+                Container(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: <Widget>[
+                      Text(
+                        'Please enter your choice',
+                        style: TextStyle(
+                          fontSize: 24.0,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      SizedBox(height: 16.0),
+                      InkWell(
+                        child: _isListening == true
+                            ? Icon(
+                                Icons.mic,
+                                size: MediaQuery.of(context).size.height * 0.3,
+                              )
+                            : Icon(Icons.mic_off,
+                                size: MediaQuery.of(context).size.height * 0.3),
+                        onTap: () {
+                          tt_speech.stop();
+
+                          _text = "";
+                          _listen();
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           )),
     );
   }

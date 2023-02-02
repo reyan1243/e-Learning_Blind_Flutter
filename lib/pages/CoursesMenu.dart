@@ -3,6 +3,7 @@ import 'package:elearningblind/pages/AddCourse.dart';
 import 'package:elearningblind/pages/AdminCoursesHomePage.dart';
 import 'package:elearningblind/pages/AdminLectures.dart';
 import 'package:elearningblind/pages/AdminMenu.dart';
+import 'package:elearningblind/pages/EditCourse.dart';
 import 'package:elearningblind/pages/LecturesMenu.dart';
 import 'package:elearningblind/pages/StudentCoursesHomePage.dart';
 import 'package:elearningblind/pages/TestsMenu.dart';
@@ -192,6 +193,18 @@ class _CoursesMenuState extends State<CoursesMenu> {
                                                 widget.studentID!,
                                                 data['courseID'],
                                                 data['name'])));
+                          },
+                          onLongPress: () {
+                            if (widget.isAdmin) {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (ctx) => EditCourse({
+                                            'name': data['name'],
+                                            'desc': data['desc'],
+                                            'courseID': data['courseID']
+                                          })));
+                            }
                           },
                           child: Container(
                             height: 100.0,
