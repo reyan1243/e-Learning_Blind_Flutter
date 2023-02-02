@@ -101,6 +101,7 @@ class _StudentLoginState extends State<StudentLogin> {
             pass = doc.docs.first["pin"];
             if (pass == passwordController.text) {
               _tts("Logged In");
+              FocusScope.of(context).unfocus();
               // SchedulerBinding.instance.addPostFrameCallback((_) {
               Navigator.pushReplacement(
                 context,

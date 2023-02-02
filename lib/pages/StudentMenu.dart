@@ -1,11 +1,14 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:elearningblind/pages/CoursesMenu.dart';
 import 'package:elearningblind/pages/GradesMenu.dart';
 import 'package:elearningblind/pages/HomePage.dart';
 import 'package:elearningblind/pages/StudentLogIn.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import '../notificationservice/notification_service.dart';
 import 'AnnouncementsMenu.dart';
 import 'TestsMenu.dart';
 import 'ResultMenu.dart';
@@ -26,6 +29,23 @@ class StudentMenu extends StatefulWidget {
 }
 
 class _StudentMenuState extends State<StudentMenu> {
+  Future<void> getDeviceTokenToSendNotification() async {
+    // get device token and add to db
+    final FirebaseMessaging _fcm = FirebaseMessaging.instance;
+    final token = await _fcm.getToken().toString();
+
+    // add to collection if doesnt exist already
+    DocumentReference ref =
+        await FirebaseFirestore.instance.collection('device_tokens').doc(token);
+
+    DocumentSnapshot snapshot = await ref.get();
+    if (!snapshot.exists) {
+      await ref.set({
+        'token': token,
+      });
+    }
+  }
+
   var items = [
     //Announcement,courses(lectures-update-to-courses),Messages
     {0: "Announcements", 1: AnnouncementsMenu(false)},
@@ -115,6 +135,43 @@ class _StudentMenuState extends State<StudentMenu> {
     }
 
     speak_messages();
+
+    FirebaseMessaging.instance.getInitialMessage().then(
+      (message) {
+        print("FirebaseMessaging.instance.getInitialMessage");
+        if (message != null) {
+          print("New Notification");
+          _tts("You have a notification");
+        }
+      },
+    );
+    //
+    print("before");
+    //   // when app is opened
+    FirebaseMessaging.onMessage.listen(
+      (message) {
+        print("FirebaseMessaging.onMessage.listen");
+        if (message.notification != null) {
+          print(message.notification!.title);
+          print(message.notification!.body);
+          print("message.data11 ${message.data}");
+          NotificationService.createAndDisplayNotification(message);
+        }
+      },
+    );
+    //
+    //   // when app is in background (not closed)
+    FirebaseMessaging.onMessageOpenedApp.listen(
+      (message) {
+        print("FirebaseMessaging.onMessageOpenedApp.listen");
+        if (message.notification != null) {
+          print(message.notification!.title);
+          print(message.notification!.body);
+          print("message.data22 ${message.data['_id']}");
+        }
+      },
+    );
+
     super.initState();
   }
 
@@ -212,7 +269,7 @@ class _StudentMenuState extends State<StudentMenu> {
       body: WillPopScope(
         onWillPop: () async => false,
         child: Container(
-          padding: EdgeInsets.only(top: 10),
+          padding: const EdgeInsets.only(top: 10),
           child: Column(
             children: [
               Row(
