@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:text_to_speech/text_to_speech.dart' as tts;
 import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:url_launcher/url_launcher.dart';
 
 class LecturesMenu extends StatefulWidget {
   LecturesMenu({
@@ -106,6 +107,15 @@ class _LecturesMenuState extends State<LecturesMenu> {
     super.initState();
   }
 
+  Future<void> _launchInBrowser(Uri url) async {
+    if (!await launchUrl(
+      url,
+      mode: LaunchMode.externalApplication,
+    )) {
+      throw Exception('Could not launch $url');
+    }
+  }
+
   // void speak_messages() async {
   //   for (int i = 0; i <= _ttsMessages.length; i++) {
   //     await Future.delayed(const Duration(milliseconds: 3000), () {
@@ -183,6 +193,9 @@ class _LecturesMenuState extends State<LecturesMenu> {
                                               "docID": document.id
                                             }, "lectures")))
                                 : "";
+                          },
+                          onTap: () async {
+                            await _launchInBrowser(Uri.parse(data['url']));
                           },
                           child: Card(
                             child: ListTile(

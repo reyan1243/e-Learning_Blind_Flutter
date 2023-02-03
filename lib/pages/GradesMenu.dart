@@ -12,11 +12,11 @@ import 'package:text_to_speech/text_to_speech.dart' as tts;
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class GradesMenu extends StatefulWidget {
-  GradesMenu(this.isAdmin, this.courseID, this.studentid);
+  GradesMenu(this.isAdmin, this.courseID, this.studentid, this.name);
 
   static const routeName = 'GradesMenu';
 
-  String studentid, courseID;
+  String studentid, courseID, name;
   bool isAdmin;
 
   @override
@@ -77,10 +77,13 @@ class _GradesMenuState extends State<GradesMenu> {
 
   @override
   void dispose() {
-    setState(() {
-      tt_speech.stop();
-      _isListening = false;
-    });
+    if (!widget.isAdmin) {
+      setState(() {
+        tt_speech.stop();
+        _isListening = false;
+      });
+    }
+
     // _text = "";
     // _isListening = false;
     super.dispose();
@@ -88,8 +91,6 @@ class _GradesMenuState extends State<GradesMenu> {
 
   @override
   void initState() {
-    tt_speech = tts.TextToSpeech();
-    _speech = stt.SpeechToText();
     _mystream = FirebaseFirestore.instance
         .collection('courses')
         .doc(widget.courseID)
@@ -98,6 +99,9 @@ class _GradesMenuState extends State<GradesMenu> {
         .snapshots();
 
     if (!widget.isAdmin!) {
+      tt_speech = tts.TextToSpeech();
+      _speech = stt.SpeechToText();
+
       void getData() async {
         await FirebaseFirestore.instance
             .collection('courses')
@@ -139,18 +143,20 @@ class _GradesMenuState extends State<GradesMenu> {
 
   @override
   Widget build(BuildContext context) {
-    if (_text == "go back") {
-      setState(() {
-        tt_speech.stop();
-        _isListening = false;
-      });
-      Navigator.pop(context);
-    } else if (_text == "repeat") {
-      setState(() {
-        tt_speech.stop();
-        _isListening = false;
-      });
-      // setState(() {});
+    if (!widget.isAdmin) {
+      if (_text == "go back") {
+        setState(() {
+          tt_speech.stop();
+          _isListening = false;
+        });
+        Navigator.pop(context);
+      } else if (_text == "repeat") {
+        setState(() {
+          tt_speech.stop();
+          _isListening = false;
+        });
+        // setState(() {});
+      }
     }
 
     return Scaffold(

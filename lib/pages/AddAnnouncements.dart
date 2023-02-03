@@ -155,15 +155,17 @@ class _AddAnnouncementsState extends State<AddAnnouncements> {
 
       List<String> tokens = [];
 
-      for (int i = 0; i < snapshot.docs.length; i++) {
-        tokens.add(snapshot.docs[i]['token']);
-      }
+      print(snapshot.docs[1]['token']);
+
+      // for (int i = 0; i < snapshot.docs.length; i++) {
+      //   tokens.add(snapshot.docs[i]['token']);
+      // }
 
       // now call api to show notification on all devices
       const String SERVER_KEY =
           "AAAAWCZlrro:APA91bEi0dwElLkIqsT2JIzUayebbwnDVbp1g_YhE2uVk-N9vu-7LnBG9KdQMiEzPgCmw000N1D75EJObTDNEpUTHQoQUJMHLrErGJyHg89uy71MyuHC3Qc0Ufvv_KZfSaRXJPMQapW-";
 
-      const String APIEndpoint = "https://fcm.googleapis.com/fcm/send";
+      // const String APIEndpoint = "https://fcm.googleapis.com/fcm/send";
 
       final Map<String, dynamic> data = {
         'registration_ids': tokens,

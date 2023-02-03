@@ -47,12 +47,12 @@ class _UploadPdfState extends State<UploadPdf> {
         .child('playground')
         .child('/${filename}');
 
-    final metadata = firebase_storage.SettableMetadata(
-        contentType: 'file/pdf',
-        customMetadata: {'picked-file-path': file.path});
+    // final metadata = firebase_storage.SettableMetadata(
+    //     contentType: 'file/pdf',
+    //     customMetadata: {'picked-file-path': file.path});
     print("Uploading..!");
 
-    uploadTask = ref.putData(await file.readAsBytes(), metadata);
+    uploadTask = ref.putData(await file.readAsBytes());
 
     print("done..!");
 

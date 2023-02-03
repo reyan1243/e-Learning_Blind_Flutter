@@ -30,7 +30,8 @@ dependencies:
   firebase_storage: ^11.0.0
   flutter_document_picker: ^5.1.0
   firebase_messaging: 
-  flutter_local_notifications: 
+  flutter_local_notifications:
+  url_launcher: ^6.1.8
   http:
 #  firebase_messaging: ^14.2.1
 #  flutter_local_notifications:

@@ -13,10 +13,10 @@ import 'package:speech_to_text/speech_to_text.dart' as stt;
 class TestsMenu extends StatefulWidget {
   static const routeName = 'TestsMenu';
 
-  TestsMenu({this.isAdmin, this.courseID, this.studentID});
+  TestsMenu({this.isAdmin, this.courseID, this.studentID, this.name});
 
   bool? isAdmin;
-  String? courseID, studentID;
+  String? courseID, studentID, name;
 
   @override
   State<TestsMenu> createState() => _TestsMenuState();
@@ -26,6 +26,7 @@ class _TestsMenuState extends State<TestsMenu> {
   // var items = [
   late tts.TextToSpeech tt_speech;
   late stt.SpeechToText _speech;
+  List<Map<String, dynamic>> students = [];
 
   bool _isListening = false;
   double rate = 0.5;
@@ -112,6 +113,7 @@ class _TestsMenuState extends State<TestsMenu> {
         .doc(widget.courseID)
         .collection('testsassignments')
         .snapshots();
+
     tt_speech = tts.TextToSpeech();
     _speech = stt.SpeechToText();
 
@@ -150,6 +152,21 @@ class _TestsMenuState extends State<TestsMenu> {
       speak_messages();
       //
 
+    }
+
+    if (widget.isAdmin!) {
+      void getData() async {
+        await FirebaseFirestore.instance.collection('users').get().then((doc) {
+          doc.docs.forEach((data) {
+            students.add({
+              "name": data['name'],
+              "studentID": data['studentID'],
+            });
+          });
+        });
+      }
+
+      getData();
     }
 
     super.initState();
@@ -209,52 +226,6 @@ class _TestsMenuState extends State<TestsMenu> {
                           //             data['name'])));
 
                         }
-                        //   var _ttsMessages = snapshot.data!.docs
-                        //       .map((DocumentSnapshot document) {
-                        //     Map<String, dynamic> data =
-                        //         document.data()! as Map<String, dynamic>;
-                        //     return data['code'].toString();
-                        //   }).toList();
-                        //   var _ttsMessages1 = snapshot.data!.docs
-                        //       .map((DocumentSnapshot document) {
-                        //     Map<String, dynamic> data =
-                        //         document.data()! as Map<String, dynamic>;
-                        //     return data['desc'].toString();
-                        //   }).toList();
-                        //
-                        //   void speak_messages() async {
-                        //     for (int i = 0; i <= _ttsMessages.length; i++) {
-                        //       // t1 = Timer(Duration(seconds: 3), () {
-                        //       //   _tts(_ttsMessages[i]);
-                        //       // });
-                        //       await Future.delayed(
-                        //           const Duration(milliseconds: 3000), () {
-                        //         _tts(_ttsMessages[i]);
-                        //       });
-                        //       await Future.delayed(
-                        //           const Duration(milliseconds: 2000), () {
-                        //         _tts(_ttsMessages1[i]);
-                        //       });
-                        //     }
-                        //   }
-                        //
-                        //   speak_messages();
-                        //   //
-                        //   if (_text == data['code'].toString()) {
-                        //     print("matched");
-                        //     tt_speech.stop();
-                        //     validate(document.id);
-                        //
-                        //     // Navigator.push(
-                        //     //     context,
-                        //     //     MaterialPageRoute(
-                        //     //         builder: (ctx) => StudentCoursesHomePage(
-                        //     //             widget.studentID!,
-                        //     //             data['courseID'],
-                        //     //             data['name'])));
-                        //
-                        //   }
-                        // }
 
                         return Column(
                           children: [
@@ -276,41 +247,11 @@ class _TestsMenuState extends State<TestsMenu> {
                                                     // "studentID": widget.studentID,
                                                     "courseID":
                                                         widget.courseID!,
+                                                    "students": students
                                                   },
                                                 )),
                                       )
                                     : validate(document.id);
-                                // : await FirebaseFirestore.instance
-                                //     .collection('courses')
-                                //     .doc(widget.courseID)
-                                //     .collection('testsassignments')
-                                //     .doc(document.id)
-                                //     .collection("answers")
-                                //     // .where("assignmentID",
-                                //     //     isEqualTo: document.id)
-                                //     .where("studentID",
-                                //         isEqualTo: widget.studentID)
-                                //     .get()
-                                //     .then((doc) {
-                                //     if (doc.docs.isNotEmpty) {
-                                //       print(data['studentID']);
-                                //       _tts("Answer already submitted");
-                                //     } else {
-                                //       Navigator.push(
-                                //         context,
-                                //         MaterialPageRoute(
-                                //             builder: (context) => AddAnswer(
-                                //                   data: {
-                                //                     "docID": document.id,
-                                //                     "studentID":
-                                //                         widget.studentID,
-                                //                     "courseID":
-                                //                         widget.courseID!,
-                                //                   },
-                                //                 )),
-                                //       );
-                                //     }
-                                //   });
                               },
                               onLongPress: () {
                                 widget.isAdmin!

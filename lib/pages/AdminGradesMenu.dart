@@ -27,9 +27,12 @@ class _AdminGradesMenuState extends State<AdminGradesMenu> {
   bool isSelected = false;
   @override
   void dispose() {
-    idNode.dispose();
     idController.clear();
     descController.clear();
+    idNode.dispose();
+    idController.dispose();
+    descController.dispose();
+    descNode.dispose();
 
     super.dispose();
   }
@@ -89,6 +92,8 @@ class _AdminGradesMenuState extends State<AdminGradesMenu> {
   // var items = [
   @override
   Widget build(BuildContext context) {
+    List<Map<String, dynamic>> students = [];
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Grades Menu"),
@@ -114,6 +119,17 @@ class _AdminGradesMenuState extends State<AdminGradesMenu> {
                       return Text("Loading");
                     }
 
+                    students =
+                        snapshot.data!.docs.map<Map<String, dynamic>>((value) {
+                      Map<String, dynamic> data =
+                          value.data()! as Map<String, dynamic>;
+
+                      return {
+                        "name": data['name'],
+                        "studentID": data['studentID'],
+                      };
+                    }).toList();
+
                     return Column(
                       children: [
                         const Text(
@@ -136,7 +152,7 @@ class _AdminGradesMenuState extends State<AdminGradesMenu> {
                           child: DropdownButton<String>(
                             hint: Text("Select"),
                             borderRadius: BorderRadius.circular(8),
-                            value: null,
+                            value: dropdownValue,
                             icon: const Icon(Icons.arrow_drop_down),
                             elevation: 8,
                             style: const TextStyle(
@@ -157,9 +173,8 @@ class _AdminGradesMenuState extends State<AdminGradesMenu> {
                                   value.data()! as Map<String, dynamic>;
 
                               return DropdownMenuItem<String>(
-                                value: data['studentID'],
-                                child:
-                                    FittedBox(child: Text(data['studentID'])),
+                                value: data['name'],
+                                child: FittedBox(child: Text(data['name'])),
                               );
                             }).toList(),
                           ),
@@ -186,11 +201,17 @@ class _AdminGradesMenuState extends State<AdminGradesMenu> {
                                         color: Colors.white))),
                           ),
                           onPressed: () {
+                            var studentID = students.firstWhere((element) =>
+                                element['name'] == dropdownValue)['studentID'];
+
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => GradesMenu(
-                                    true, widget.courseID, dropdownValue!),
+                                    true,
+                                    widget.courseID,
+                                    studentID!,
+                                    dropdownValue!),
                               ),
                             );
                           },
@@ -203,7 +224,7 @@ class _AdminGradesMenuState extends State<AdminGradesMenu> {
                         ),
                       ),
                     )
-                  : SizedBox(
+                  : const SizedBox(
                       height: 0,
                       width: 0,
                     ),

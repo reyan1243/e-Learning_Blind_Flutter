@@ -20,6 +20,7 @@ class AdminAssignmentsMenu extends StatefulWidget {
 
 class _AdminAssignmentsMenuState extends State<AdminAssignmentsMenu> {
   String? courseID, assignmentID;
+  List<Map<String, dynamic>> students = [];
 
   @override
   void initState() {
@@ -27,6 +28,8 @@ class _AdminAssignmentsMenuState extends State<AdminAssignmentsMenu> {
     // studentID = widget.data['studentID'];
     // descController.text = widget.data['desc'];
     assignmentID = widget.data['docID'];
+    students = widget.data['students'];
+
     super.initState();
   }
 
@@ -38,117 +41,120 @@ class _AdminAssignmentsMenuState extends State<AdminAssignmentsMenu> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(10),
-        child: Column(
-          children: [
-            const SizedBox(
-              height: 15.0,
-            ),
-            StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('courses')
-                    .doc(courseID)
-                    .collection('testsassignments')
-                    .doc(assignmentID)
-                    .collection('answers')
-                    .snapshots(),
-                builder: (BuildContext context,
-                    AsyncSnapshot<QuerySnapshot> snapshot) {
-                  if (snapshot.hasError) {
-                    return Text('Something went wrong');
-                  }
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Text("Loading");
-                  }
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              const SizedBox(
+                height: 15.0,
+              ),
+              StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance
+                      .collection('courses')
+                      .doc(courseID)
+                      .collection('testsassignments')
+                      .doc(assignmentID)
+                      .collection('answers')
+                      .snapshots(),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (snapshot.hasError) {
+                      return Text('Something went wrong');
+                    }
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Text("Loading");
+                    }
 
-                  return Expanded(
-                    child: ListView(
-                      children:
-                          snapshot.data!.docs.map((DocumentSnapshot document) {
-                        Map<String, dynamic> data =
-                            document.data()! as Map<String, dynamic>;
-                        return GestureDetector(
-                          onTap: () async {
-                            bool exists = false;
+                    if (snapshot.hasData) {
+                      return ListView(
+                        scrollDirection: Axis.vertical,
+                        shrinkWrap: true,
+                        children: snapshot.data!.docs
+                            .map((DocumentSnapshot document) {
+                          Map<String, dynamic> data =
+                              document.data()! as Map<String, dynamic>;
+                          String? name;
+                          try {
+                            name = students.firstWhere((element) =>
+                                element['studentID'] ==
+                                data['studentID'])['name'];
+                          } catch (err) {
+                            print(err.toString());
+                          }
 
-                            await FirebaseFirestore.instance
-                                .collection('courses')
-                                .doc(courseID)
-                                .collection('grades')
-                                .where("assignmentID", isEqualTo: assignmentID)
-                                .where("studentID",
-                                    isEqualTo: data['studentID'])
-                                .get()
-                                .then((doc) {
-                              if (doc.docs.isNotEmpty) {
-                                exists = true;
-                                Fluttertoast.showToast(
-                                    msg: 'Grade Exists!',
-                                    toastLength: Toast.LENGTH_SHORT,
-                                    gravity: ToastGravity.BOTTOM,
-                                    backgroundColor: Colors.blueGrey,
-                                    textColor: Colors.white);
-                              } else {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => AddGrade({
-                                      "answerID": document.id,
-                                      "assignmentID": assignmentID,
-                                      "studentID": data['studentID'],
-                                      "courseID": courseID,
-                                    }),
-                                  ),
-                                );
-                              }
-                            });
-                          },
-                          // onLongPress: () {
-                          //   isAdmin
-                          //       ?
-                          //       Navigator.push(
-                          //           context,
-                          //           MaterialPageRoute(
-                          //             builder: (context) => EditAnnouncements({
-                          //               "docID": document.id,
-                          //               "desc": data['desc'],
-                          //             }),
-                          //           ),
-                          //         )
-                          //       : "";
-                          // },
-                          //todo: add checklist to check if answer exists
-                          child: Expanded(
-                            child: Container(
-                              height: 100.0,
-                              child: Card(
-                                child: ListTile(
-                                  title: FittedBox(
-                                    child: Column(
-                                      children: [
-                                        Text("StudentID: ${data['studentID']}"),
-                                        Text(
-                                            "AssignmentID: ${data['assignmentID']}")
-                                      ],
+                          return GestureDetector(
+                            onTap: () async {
+                              bool exists = false;
+
+                              await FirebaseFirestore.instance
+                                  .collection('courses')
+                                  .doc(courseID)
+                                  .collection('grades')
+                                  .where("assignmentID",
+                                      isEqualTo: assignmentID)
+                                  .where("studentID",
+                                      isEqualTo: data['studentID'])
+                                  .get()
+                                  .then((doc) {
+                                if (doc.docs.isNotEmpty) {
+                                  exists = true;
+                                  Fluttertoast.showToast(
+                                      msg: 'Grade Exists!',
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      gravity: ToastGravity.BOTTOM,
+                                      backgroundColor: Colors.blueGrey,
+                                      textColor: Colors.white);
+                                } else {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => AddGrade({
+                                        "answerID": document.id,
+                                        "assignmentID": assignmentID,
+                                        "studentID": data['studentID'],
+                                        "courseID": courseID,
+                                      }),
                                     ),
+                                  );
+                                }
+                              });
+                            },
+                            child: Flex(direction: Axis.horizontal, children: [
+                              Expanded(
+                                child: Card(
+                                  child: ListTile(
+                                    title: Text(name == null
+                                        ? "No Data"
+                                        : "Student: $name"),
+                                    //FittedBox(
+                                    // child:
+                                    // child: Column(
+                                    //   children: [
+                                    //     Text("Student: $name"),
+                                    //     // SizedBox(
+                                    //     //   height: 10,
+                                    //     // ),
+                                    //     // Text(
+                                    //     //     "AssignmentID: ${data['assignmentID']}"),
+                                    //     // SizedBox(
+                                    //     //   height: 10,
+                                    //     // ),
+                                    //   ],
+                                    // ),
+                                    //),
+                                    subtitle: Text("Answer: ${data['answer']}"),
                                   ),
-                                  subtitle: Text("Answer: ${data['answer']}"),
                                 ),
                               ),
-                            ),
-                          ),
-                        );
-                      }).toList(),
+                            ]),
+                          );
+                        }).toList(),
+                      );
+                    }
 
-                      // itemCount: items.length,
-                      // itemBuilder: (context, index) {
-                      //
-                      // },
-                      // ),
-                    ),
-                    //},
-                  );
-                }),
-          ],
+                    return Text("No Data Found!");
+                  }),
+            ],
+          ),
         ),
       ),
     );

@@ -32,11 +32,12 @@ class _StudentMenuState extends State<StudentMenu> {
   Future<void> getDeviceTokenToSendNotification() async {
     // get device token and add to db
     final FirebaseMessaging _fcm = FirebaseMessaging.instance;
-    final token = await _fcm.getToken().toString();
+    final token = await _fcm.getToken();
+    print("token is $token");
 
     // add to collection if doesnt exist already
     DocumentReference ref =
-        await FirebaseFirestore.instance.collection('device_tokens').doc(token);
+        FirebaseFirestore.instance.collection('device_tokens').doc(token);
 
     DocumentSnapshot snapshot = await ref.get();
     if (!snapshot.exists) {
@@ -50,13 +51,7 @@ class _StudentMenuState extends State<StudentMenu> {
     //Announcement,courses(lectures-update-to-courses),Messages
     {0: "Announcements", 1: AnnouncementsMenu(false)},
     {0: "Messages", 1: StudentChat(false, "")},
-    {
-      0: "Courses",
-      1: CoursesMenu(
-        isAdmin: false,
-        studentID: "",
-      )
-    },
+    {0: "Courses", 1: CoursesMenu(isAdmin: false, studentID: "", name: "")},
   ];
 
   late stt.SpeechToText _speech;
@@ -117,7 +112,7 @@ class _StudentMenuState extends State<StudentMenu> {
 
     // items[2][1] = GradesMenu(studentID!);
     items[1][1] = StudentChat(false, username);
-    items[2][1] = CoursesMenu(isAdmin: false, studentID: studentID);
+    items[2][1] = CoursesMenu(isAdmin: false, studentID: studentID, name: name);
 
     void speak_messages() async {
       for (int i = 0; i <= _ttsMessages.length; i++) {
@@ -135,6 +130,8 @@ class _StudentMenuState extends State<StudentMenu> {
     }
 
     speak_messages();
+
+    getDeviceTokenToSendNotification();
 
     FirebaseMessaging.instance.getInitialMessage().then(
       (message) {

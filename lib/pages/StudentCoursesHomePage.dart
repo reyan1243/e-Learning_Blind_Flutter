@@ -29,9 +29,10 @@ class _StudentCoursesHomePageState extends State<StudentCoursesHomePage> {
       1: TestsMenu(
         isAdmin: false,
         courseID: "",
+        name: "",
       )
     },
-    {0: "Grades", 1: GradesMenu(false, "", "")},
+    {0: "Grades", 1: GradesMenu(false, "", "", "")},
     {0: "Lectures", 1: LecturesMenu()},
   ];
 
@@ -91,9 +92,10 @@ class _StudentCoursesHomePageState extends State<StudentCoursesHomePage> {
       isAdmin: false,
       courseID: widget.courseID,
       studentID: widget.studentID,
+      name: name,
     );
 
-    items[1][1] = GradesMenu(false, widget.courseID!, widget.studentID!);
+    items[1][1] = GradesMenu(false, widget.courseID!, widget.studentID!, name);
     items[2][1] = LecturesMenu(isAdmin: false, courseID: widget.courseID);
 
     void speak_messages() async {
@@ -173,7 +175,7 @@ class _StudentCoursesHomePageState extends State<StudentCoursesHomePage> {
           context,
           MaterialPageRoute(
             builder: (context) =>
-                GradesMenu(false, widget.courseID!, widget.studentID!),
+                GradesMenu(false, widget.courseID!, widget.studentID!, name),
           ),
         );
       });

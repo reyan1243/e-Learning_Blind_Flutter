@@ -18,9 +18,9 @@ class CoursesMenu extends StatefulWidget {
   static const routeName = 'CoursesMenu';
 
   bool isAdmin;
-  String? studentID;
+  String? studentID, name;
 
-  CoursesMenu({required this.isAdmin, this.studentID});
+  CoursesMenu({required this.isAdmin, this.studentID, this.name});
 
   @override
   State<CoursesMenu> createState() => _CoursesMenuState();
@@ -100,8 +100,6 @@ class _CoursesMenuState extends State<CoursesMenu> {
       }
 
       speak_messages();
-      //
-
     }
 
     super.initState();
