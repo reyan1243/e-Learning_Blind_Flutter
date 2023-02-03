@@ -294,8 +294,8 @@ class _StudentLoginState extends State<StudentLogin> {
                                     ),
                                     filled: true,
                                     fillColor: Colors.white70,
-                                    labelText: 'PIN',
-                                    hintText: "Enter PIN",
+                                    labelText: 'Password',
+                                    hintText: "Enter Password",
                                     suffixIcon: IconButton(
                                       icon: _showPwd
                                           ? Icon(Icons.visibility_off,

@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:elearningblind/pages/AddAnswer.dart';
 import 'package:elearningblind/pages/AddTestAssignment.dart';
-import 'package:elearningblind/pages/AdminAssinmentsMenu.dart';
+import 'package:elearningblind/pages/AdminAnswersMenu.dart';
 import 'package:elearningblind/pages/EditTestAssignment.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -241,7 +241,7 @@ class _TestsMenuState extends State<TestsMenu> {
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                                AdminAssignmentsMenu(
+                                                AdminAnswersMenu(
                                                   data: {
                                                     "docID": document.id,
                                                     // "studentID": widget.studentID,

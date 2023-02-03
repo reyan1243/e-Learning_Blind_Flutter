@@ -111,7 +111,8 @@ class _AdminLoginState extends State<AdminLogin> {
                                         await FirebaseFirestore.instance
                                             .collection("admins")
                                             .where("username",
-                                                isEqualTo: userController.text)
+                                                isEqualTo:
+                                                    userController.text.trim())
                                             .get()
                                             .then((doc) {
                                           if (doc.docs.isEmpty) {

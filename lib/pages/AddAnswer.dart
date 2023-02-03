@@ -221,6 +221,11 @@ class _AddAnswerState extends State<AddAnswer> {
                                         color: Colors.white))),
                           ),
                           onPressed: () async {
+                            submitanswer();
+                            answerController.clear();
+                            SchedulerBinding.instance.addPostFrameCallback((_) {
+                              Navigator.pop(context);
+                            });
                             // if (
                             //     // nameController.text.isNotEmpty &&
                             //     answerController.text.isNotEmpty) {

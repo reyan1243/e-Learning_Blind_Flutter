@@ -15,7 +15,7 @@ class AddGrade extends StatefulWidget {
 }
 
 class _AddGradeState extends State<AddGrade> {
-  String? studentID, answerID, assignmentID, courseID;
+  String? studentID, answerID, name, assignmentID, courseID;
 
   @override
   void dispose() {
@@ -37,6 +37,7 @@ class _AddGradeState extends State<AddGrade> {
     studentID = widget.data['studentID'];
     answerID = widget.data['answerID'];
     assignmentID = widget.data['assignmentID'];
+    name = widget.data['name'];
     // descController.text = widget.data['desc'];
     // docID = widget.data['docID'];
     super.initState();
@@ -60,7 +61,7 @@ class _AddGradeState extends State<AddGrade> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text("Student ID: ${studentID!}"),
+                    Text("Student: ${name!}"),
                     InputField(
                       textValueController: nameController,
                       node: nameNode,
